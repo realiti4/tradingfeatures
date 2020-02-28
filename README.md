@@ -4,7 +4,7 @@ A small package to get history, easily download all avaliable history to csv or 
 
 ## Installation
 
-    pip install git+https://github.com/realiti4/bitfinexget
+    pip install bitfinexget
 
 ## Example
 

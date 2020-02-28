@@ -7,7 +7,7 @@ setuptools.setup(
     name="bitfinexget",
     version="0.2",
     author="Onur Cetinkol",
-    author_email="author@example.com",
+    author_email="realiti44@gmail.com",
     description="A small package to get history, easily download all avaliable history to csv or update current csv files",
     long_description=long_description,
     long_description_content_type="text/markdown",
