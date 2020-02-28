@@ -23,7 +23,7 @@ Bitfinex limits latest history call to 10000. If you would like get older data i
     df.to_csv('data/bitfinex_1h_downloaded.csv', index=False)
     
     df = bitfinex.get_hist(['30m', 30], start=1464778000, end=int(time.time()))
-    df.to_csv('data/tradingview/bitfinex_30m_downloaded.csv', index=False)
+    df.to_csv('data/bitfinex_30m_downloaded.csv', index=False)
 
 Select the gap (5m, 15m, 30m, 1h, 3h, 6h, 12h) etc. and don't remember to change minutes equivalent, like ['15m', 15], ['3h', 240]
 
