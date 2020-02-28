@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="bitfinexget",
-    version="0.1",
+    version="0.2",
     author="Onur Cetinkol",
     author_email="author@example.com",
     description="A small package to get history, easily download all avaliable history to csv or update current csv files",

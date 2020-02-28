@@ -45,7 +45,9 @@ class bitfinex:
             return df['close'].to_numpy()
         return df
     
-    def get_hist(self, start, end, time_list, interval=60):
+    def get_hist(self, time_list, start=1364778000, end=int(time.time()), interval=60):
+        start, end = self.timestamp_check(start), self.timestamp_check(end)
+
         hour = time_list[0]
         interval = 60 * time_list[1] * 1000
         steps = ((end - start) // interval) // 120
@@ -91,7 +93,7 @@ class bitfinex:
                         df = df[i+1:]                  
                         break
             else:
-                df = self.get_hist(int(last_time), current_time, times)
+                df = self.get_hist(times, start=int(last_time), end=current_time)
             if df is None:
                 print(f'{times[0]} is already up to date!')
                 break     
@@ -104,3 +106,9 @@ class bitfinex:
             csv_file.to_csv(path)
             print('updated...')
 
+    def timestamp_check(self, time):
+        if len(str(time)) == 10:
+            return int(time)*1000
+        else:
+            assert len(str(time)) == 13, 'Please use a timestamp value with lenght 10!'
+            return int(time)
