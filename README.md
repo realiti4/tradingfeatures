@@ -19,16 +19,16 @@ A small package to get history, easily download all avaliable history to csv or 
 ### Download history
 Bitfinex limits latest history call to 10000. If you would like get older data it is more stricter. But you can specify a start and finish timestamp like below and get all 1h data under 5-10 minutes while respecting Bitfinex's api call limits.
 
-    df = bitfinex().get_hist(1364778000000, int(time.time())*1000, ['1h', 60])
+    df = bitfinex.get_hist(1364778000000, int(time.time())*1000, ['1h', 60])
     df.to_csv('data/bitfinex_1h_downloaded.csv', index=False)
     
-    df = bitfinex().get_hist(1364778000000, int(time.time())*1000, ['30m', 30])
+    df = bitfinex.get_hist(1364778000000, int(time.time())*1000, ['30m', 30])
     df.to_csv('data/tradingview/bitfinex_30m_downloaded.csv', index=False)
     
 '1364778000000' is the starting timestamp. From my experience it is very close to what bitfinex has as the oldest. You can try to fine tune or select a more recent time. int(time.time())*1000 is the current timestamp. Select the gap (15m, 30m, 1h, 3h, 6h) etc. and don't remember to add minutes equivalent, like ['15m', 15]
 
 ### Update csv file
 
-    bitfinex().update_csv('data/bitfinex_1h_downloaded.csv', times_to_get=[['1h', 60]]
-    bitfinex().update_csv('data/bitfinex_5m_downloaded.csv', times_to_get=[['5m', 5]]
+    bitfinex.update_csv('data/bitfinex_1h_downloaded.csv', times_to_get=[['1h', 60]]
+    bitfinex.update_csv('data/bitfinex_5m_downloaded.csv', times_to_get=[['5m', 5]]
 
