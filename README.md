@@ -17,7 +17,7 @@ A small package to get history, easily download all avaliable history to csv or 
     bitfinex.get(1000)
 
 ### Download history
-Bitfinex limits latest history call to 10000. If you would like get older data it is more stricter. But you can specify a start and finish timestamp like below and get all 1h data under 5-10 minutes while respecting Bitfinex's api call limits.
+Bitfinex limits latest history call to 10000. If you would like get older data it is more stricter. But you can specify a start and finish timestamp like below and get all 1h data under 5-10 minutes while respecting Bitfinex's api call limits. By default it'll download the entire history and you don't need to pass 'start' and 'end'
 
     df = bitfinex.get_hist(['1h', 60])
     df.to_csv('data/bitfinex_1h_downloaded.csv', index=False)
