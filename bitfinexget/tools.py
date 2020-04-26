@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from time import sleep
 
+from pathlib import Path
 
 
 def conv_time_v2(time):
@@ -78,6 +79,9 @@ class bitfinex:
         for times in times_to_get:
             csv_file = pd.read_csv(path, index_col=0)
             path_main, path_file = path.rsplit('/', 1)
+
+            # save backup
+            Path(path_main+'/backup').mkdir(parents=False, exist_ok=True)
             csv_file.to_csv(path_main+'/backup/'+path_file)
 
             # if not 'date' in csv_file:
