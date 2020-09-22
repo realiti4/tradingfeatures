@@ -32,13 +32,13 @@ class bitfinex:
 
         self.times_dict = {'5m': 5, '15m': 15, '30m': 30, '1h': 60, '3h': 180, '6h': 360, '12h': 720}
 
-    def get(self, limit=None, interval='1h', start=None, end=None, sort=-1, date=True, numpy_array=False):
+    def get(self, limit=None, timeframe='1h', start=None, end=None, sort=-1, date=True, numpy_array=False):
         start, end = self.timestamp_mts(start), self.timestamp_mts(end)
         query = {'limit': limit, 'start': start, 'end': end, 'sort': sort}
         symbol = 'tBTCUSD'
         # symbol = 'tETHUSD'
 
-        r = requests.get(f'https://api-pub.bitfinex.com/v2/candles/trade:{interval}:{symbol}/hist', params=query)
+        r = requests.get(f'https://api-pub.bitfinex.com/v2/candles/trade:{timeframe}:{symbol}/hist', params=query)
         # TODO 500 reponse handling
         if str(r.status_code).startswith('5'):
             r.raise_for_status()
@@ -56,11 +56,11 @@ class bitfinex:
             return df['close'].to_numpy()
         return df
     
-    def get_hist(self, time_list, start=1364778000, end=int(time.time()), interval=60):
-        # start, end = self.timestamp_mts(start), self.timestamp_mts(end)
+    def get_hist(self, timeframe, start=1364778000, end=int(time.time())):
+        if timeframe not in self.times_dict:
+            raise Exception('enter a valid timeframe')
 
-        hour = time_list
-        minutes = self.times_dict[time_list]
+        minutes = self.times_dict[timeframe]
 
         interval = 60 * minutes
         steps = ((end - start) // interval) // 120
@@ -71,7 +71,7 @@ class bitfinex:
             start_batch = start + (interval*i*120)
             end_batch = start_batch + (interval*120)
             try:
-                df_temp = self.get(interval=hour, start=str(start_batch), end=str(end_batch), date=False)
+                df_temp = self.get(timeframe=timeframe, start=str(start_batch), end=str(end_batch), date=False)
             except:
                 print('hata!', start_batch, end_batch)
                 if steps <= 1: return None
@@ -88,9 +88,9 @@ class bitfinex:
         df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
         return df
     
-    def update_csv(self, path, times_to_get=['1h'], alternative_mode=False):
+    def update_csv(self, path, timeframes=['1h'], alternative_mode=False):
         # TODO fix time_toget for update_csv as well
-        for times in times_to_get:
+        for times in timeframes:
             if '/' not in path:
                 path = './' + path
 
@@ -108,7 +108,7 @@ class bitfinex:
             current_time = int(time.time())
 
             if alternative_mode:
-                df = self.get(10000, interval=times)
+                df = self.get(10000, timeframe=times)
                 for i in range(len(df)):
                     if df['timestamp'][i] == last_time:
                         df = df[i+1:]                  

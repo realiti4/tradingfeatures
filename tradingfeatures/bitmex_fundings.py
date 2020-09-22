@@ -53,6 +53,21 @@ class trading_features:
         df_fundings = pd.concat(appended_data, ignore_index=True).drop_duplicates()
         df_fundings.to_csv('bitmex_fundings.csv', index=False)
 
+    def price_funding_merger(self, df, df_fundings):
+        # TODO clean it, check it for things that might be missed
+
+        df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'])
+        df['date'] = pd.to_datetime(df['date'])
+
+        # a much better merger
+        df.set_index('date', inplace=True)
+        df_fundings.set_index('date', inplace=True)
+        df_fundings.pop('timestamp')
+
+        merged = df.join(df_fundings)
+        merged.fillna(method='ffill', inplace=True)
+
+        return merged
 
     def shorts_longs(self):
         # TODO

@@ -31,7 +31,7 @@ By default it will try to download all avaliable history up to current date. You
 
 ### Update csv file
 
-    bitfinex.update_csv('data/bitfinex_1h_downloaded.csv', times_to_get=['1h']
-    bitfinex.update_csv('data/bitfinex_5m_downloaded.csv', times_to_get=['5m', '3h']
+    bitfinex.update_csv('data/bitfinex_1h_downloaded.csv', timeframes=['1h']
+    bitfinex.update_csv('data/bitfinex_5m_downloaded.csv', timeframes=['5m', '3h']
 
 When updating you can pass multiple timeframes in a list to update all in once.
