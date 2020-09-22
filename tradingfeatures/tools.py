@@ -7,6 +7,10 @@ from time import sleep
 
 from pathlib import Path
 
+"""
+    version 0.3.0
+    -timestamp conversion is changed to general UTC, TODO check if get_hist or update has any problems with it
+"""
 
 def conv_time_v2(time):
     time_list = time.tolist()
@@ -26,7 +30,10 @@ class bitfinex:
     def __init__(self):
         self.columns = ['timestamp', 'open', 'low', 'high', 'close', 'volume']
 
+        self.times_dict = {'5m': 5, '15m': 15, '30m': 30, '1h': 60, '3h': 180, '6h': 360, '12h': 720}
+
     def get(self, limit=None, interval='1h', start=None, end=None, sort=-1, date=True, numpy_array=False):
+        start, end = self.timestamp_mts(start), self.timestamp_mts(end)
         query = {'limit': limit, 'start': start, 'end': end, 'sort': sort}
         symbol = 'tBTCUSD'
         # symbol = 'tETHUSD'
@@ -40,17 +47,22 @@ class bitfinex:
         data.reverse()
 
         df = pd.DataFrame(data, columns=self.columns)
+        df['timestamp'] = df['timestamp'].div(1000).astype('int64')     # Fixing timestamp inside self.get
+
         if date:
-            df['date'] = conv_time_v2(df['timestamp'])
+            # df['date'] = conv_time_v2(df['timestamp'])
+            df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
         if numpy_array:
             return df['close'].to_numpy()
         return df
     
     def get_hist(self, time_list, start=1364778000, end=int(time.time()), interval=60):
-        start, end = self.timestamp_check(start), self.timestamp_check(end)
+        # start, end = self.timestamp_mts(start), self.timestamp_mts(end)
 
-        hour = time_list[0]
-        interval = 60 * time_list[1] * 1000
+        hour = time_list
+        minutes = self.times_dict[time_list]
+
+        interval = 60 * minutes
         steps = ((end - start) // interval) // 120
         if steps == 0: steps = 1
         df = pd.DataFrame(columns=self.columns)
@@ -72,11 +84,16 @@ class bitfinex:
             print(f'  {i} of {steps}')
             sleep(1.01)
 
-        df['date'] = conv_time_v2(df['timestamp'])
+        # df['date'] = conv_time_v2(df['timestamp'])
+        df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
         return df
     
-    def update_csv(self, path, times_to_get=[['1h', 60]], alternative_mode=False):
+    def update_csv(self, path, times_to_get=['1h'], alternative_mode=False):
+        # TODO fix time_toget for update_csv as well
         for times in times_to_get:
+            if '/' not in path:
+                path = './' + path
+
             csv_file = pd.read_csv(path, index_col=0)
             path_main, path_file = path.rsplit('/', 1)
 
@@ -88,10 +105,10 @@ class bitfinex:
             #     csv_file['date'] = conv_time_v2(csv_file['timestamp'].astype('int64'))
 
             last_time = csv_file.index[-1]
-            current_time = int(time.time())*1000
+            current_time = int(time.time())
 
             if alternative_mode:
-                df = self.get(10000, interval=times[0])
+                df = self.get(10000, interval=times)
                 for i in range(len(df)):
                     if df['timestamp'][i] == last_time:
                         df = df[i+1:]                  
@@ -99,7 +116,7 @@ class bitfinex:
             else:
                 df = self.get_hist(times, start=int(last_time), end=current_time)
             if df is None:
-                print(f'{times[0]} is already up to date!')
+                print(f'{times} is already up to date!')
                 break     
             df.set_index('timestamp', inplace=True)
 
@@ -110,9 +127,11 @@ class bitfinex:
             csv_file.to_csv(path)
             print('updated...')
 
-    def timestamp_check(self, time):
-        if len(str(time)) == 10:
-            return int(time)*1000
-        else:
-            assert len(str(time)) == 13, 'Please use a timestamp value with lenght 10!'
-            return int(time)
+    def timestamp_mts(self, time):
+        # second timestamp to millisecond timestamp
+        if time:
+            if len(str(time)) == 10:
+                return int(time)*1000
+            else:
+                assert len(str(time)) == 13, 'Please use a timestamp value with lenght 10!'
+                return int(time)

@@ -18,7 +18,7 @@ class trading_features:
                 time.sleep(61)
         return r
     
-    def get_funding_rates(self):
+    def get_funding_rates(self, df_path=None):
 
         address = 'https://www.bitmex.com/api/v1/funding'
         symbol = 'XBT'
@@ -27,6 +27,14 @@ class trading_features:
         r = self.get_(address, query)
 
         appended_data = []
+
+        # For updates
+        if df_path:
+            df_fundings = pd.read_csv(df_path)  # check if it is proper
+            appended_data.append(df_fundings)
+
+            last_time = df_fundings['timestamp'][-1:]
+            query['startTime'] = last_time             
 
         for i in range(10000):
             r = self.get_(address, query)
@@ -43,7 +51,7 @@ class trading_features:
             query['startTime'] = last_time 
 
         df_fundings = pd.concat(appended_data, ignore_index=True).drop_duplicates()
-        df_fundings.to_csv('bitmex_fundings.csv')
+        df_fundings.to_csv('bitmex_fundings.csv', index=False)
 
 
     def shorts_longs(self):
