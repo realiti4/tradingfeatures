@@ -27,7 +27,7 @@ Bitfinex limits most recent history call to 10000. If you would like get older d
 
 By default it'll download the entire history and you don't need to pass 'start' and 'end'. But you can also specify any timestamp 'start=1464778000' and 'end=1564778000' etc. like above.
 
-### Update csv file
+### Updating a csv file
 
     bitfinex.update_csv('bitfinex_1h.csv', timeframes=['1h']
     bitfinex.update_csv('bitfinex_5m.csv', timeframes=['5m', '3h']
