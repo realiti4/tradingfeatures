@@ -19,6 +19,9 @@ A useful tool to get market history and other features while respecting api limi
 ### Download all available history
 Bitfinex limits most recent history call to 10000. If you would like get older data it is even more stricter. But you can download all history in 2 lines with this tool easily under 5-10 minutes while respecting Bitfinex's api call limits. 
 
+    from tradingfeatures import bitfinex
+    bitfinex = bitfinex()
+
     df = bitfinex.get_hist('1h')
     df.to_csv('bitfinex_1h.csv', index=False)
     
