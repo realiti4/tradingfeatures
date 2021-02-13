@@ -56,7 +56,7 @@ class bitfinex:
             return df['close'].to_numpy()
         return df
     
-    def get_hist(self, timeframe, start=1364778000, end=int(time.time())):
+    def get_hist(self, timeframe, start=1364778000, end=int(time.time()), symbol='tBTCUSD'):
         if timeframe not in self.times_dict:
             raise Exception('enter a valid timeframe')
 
@@ -71,7 +71,7 @@ class bitfinex:
             start_batch = start + (interval*i*120)
             end_batch = start_batch + (interval*120)
             try:
-                df_temp = self.get(timeframe=timeframe, start=str(start_batch), end=str(end_batch), date=False)
+                df_temp = self.get(timeframe=timeframe, start=str(start_batch), end=str(end_batch), date=False, symbol=symbol)
             except:
                 print('hata!', start_batch, end_batch)
                 if steps <= 1: return None
@@ -88,7 +88,7 @@ class bitfinex:
         df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
         return df
     
-    def update_csv(self, path, timeframes=['1h'], alternative_mode=False):
+    def update_csv(self, path, timeframes=['1h'], alternative_mode=False, symbol='tBTCUSD'):
         # TODO fix time_toget for update_csv as well
         for times in timeframes:
             if '/' not in path:
@@ -108,7 +108,7 @@ class bitfinex:
             current_time = int(time.time())
 
             if alternative_mode:
-                df = self.get(10000, timeframe=times)
+                df = self.get(10000, timeframe=times, symbol=symbol)
                 for i in range(len(df)):
                     if df['timestamp'][i] == last_time:
                         df = df[i+1:]                  
