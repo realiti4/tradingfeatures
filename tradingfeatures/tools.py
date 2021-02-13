@@ -32,10 +32,10 @@ class bitfinex:
 
         self.times_dict = {'5m': 5, '15m': 15, '30m': 30, '1h': 60, '3h': 180, '6h': 360, '12h': 720}
 
-    def get(self, limit=None, timeframe='1h', start=None, end=None, sort=-1, date=True, numpy_array=False):
+    def get(self, limit=None, timeframe='1h', start=None, end=None, symbol='tBTCUSD', sort=-1, date=True, numpy_array=False):
         start, end = self.timestamp_mts(start), self.timestamp_mts(end)
         query = {'limit': limit, 'start': start, 'end': end, 'sort': sort}
-        symbol = 'tBTCUSD'
+        # symbol = 'tBTCUSD'
         # symbol = 'tETHUSD'
 
         r = requests.get(f'https://api-pub.bitfinex.com/v2/candles/trade:{timeframe}:{symbol}/hist', params=query)
