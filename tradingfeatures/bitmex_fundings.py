@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 
 
-class trading_features:
+class bitmex:
 
     def get_(self, address, query):
         r = requests.get(address, params=query)
@@ -18,7 +18,7 @@ class trading_features:
                 time.sleep(61)
         return r
     
-    def get_funding_rates(self, df_path=None):
+    def get_funding_rates(self, df_path=None, reverse='false', save_csv=True):
 
         address = 'https://www.bitmex.com/api/v1/funding'
         symbol = 'XBT'
@@ -51,7 +51,10 @@ class trading_features:
             query['startTime'] = last_time 
 
         df_fundings = pd.concat(appended_data, ignore_index=True).drop_duplicates()
-        df_fundings.to_csv('bitmex_fundings.csv', index=False)
+        if save_csv:
+            df_fundings.to_csv('bitmex_fundings.csv', index=False)
+        else:
+            return df_fundings        
 
     def price_funding_merger(self, df, df_fundings):
         # TODO clean it, check it for things that might be missed
