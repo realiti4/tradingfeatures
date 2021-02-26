@@ -64,6 +64,7 @@ class bitfinex:
 
         interval = 60 * minutes
         steps = ((end - start) // interval) // 120
+        # steps = steps + 1
         if steps == 0: steps = 1
         df = pd.DataFrame(columns=self.columns)
 

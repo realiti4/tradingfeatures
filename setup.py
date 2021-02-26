@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tradingfeatures",
-    version="0.3.8",
+    version="0.3.9",
     author="Onur Cetinkol",
     author_email="realiti44@gmail.com",
     description="A small package to get history, easily download all avaliable history to csv or update current csv files",
