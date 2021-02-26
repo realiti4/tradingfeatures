@@ -45,15 +45,16 @@ class base_v2:
 
         return merged.to_numpy()
         
-    def get_all(self, path, fundings=False, date=True, save=True, update=False):
+    def uber_get(self, path, fundings=False, date=True, save=True, update=False):
         if update:
             df1 = self.df1_updated
+            df2 = self.df2_updated
         else:
             df1 = self.bitfinex.get_hist('1h').set_index('timestamp')
-        df2 = self.bitstamp.get_hist('1h').set_index('timestamp')
+            df2 = self.bitstamp.get_hist().set_index('timestamp')
 
         df1.index = df1.index.astype(int)
-        df2.index = df2.index.astype(int)
+        # df2.index = df2.index.astype(int)
         
         df1 = df1[self.columns]
         df2 = df2[self.columns]
@@ -86,14 +87,17 @@ class base_v2:
             
         return df_final
         
-    def update_all(self, path, fundings):
-        bitfinex_path = path + '/bitfinex_1h.csv'        
+    def uber_update(self, path, fundings):
+        bitfinex_path = path + '/bitfinex_1h.csv'
+        bitstamp_path = path + '/bitstamp_1h.csv'         
     
         self.bitfinex.update_csv(bitfinex_path, alternative_mode=True)
+        self.bitstamp.update(bitstamp_path)
         
         self.df1_updated = pd.read_csv(bitfinex_path, index_col='timestamp')
+        self.df2_updated = pd.read_csv(bitstamp_path, index_col='timestamp')
         
-        updated = self.get_all(path, fundings, update=True)
+        updated = self.uber_get(path, fundings, update=True)
         
         updated.to_csv(path + '/merged_1h.csv')
 

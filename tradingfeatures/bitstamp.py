@@ -26,18 +26,9 @@ class bitstamp:
         # df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
         # datetime.utcfromtimestamp(1364778000)
 
-        # print('debug')
-
-        # self.get_hist('1h',)
-
-        # # Bitmex remaining limit
-        # if 'x-ratelimit-remaining' in r.headers:
-        #     if int(r.headers['x-ratelimit-remaining']) <= 1:
-        #         print('sleeping...')
-        #         time.sleep(61)
         return df
 
-    def get_hist(self, timeframe, start=1364778000, end=int(time.time()), symbol='tBTCUSD'):
+    def get_hist(self, timestamp='1h', start=1364778000, end=int(time.time()), symbol='tBTCUSD'):
         # if timeframe not in self.times_dict:
         #     raise Exception('enter a valid timeframe')
 
@@ -48,7 +39,7 @@ class bitstamp:
 
         total_entries = (end - start) // interval
         steps = (total_entries // per_step) + 1
-        # if steps == 0: steps = 1
+
         df = pd.DataFrame(columns=['high', 'timestamp', 'volume', 'low', 'close', 'open'])
 
         for i in range(steps):
@@ -60,8 +51,6 @@ class bitstamp:
                 print('hata!', start_batch, end_batch)
                 if steps <= 1: return None
 
-            # print(len(df_temp))
-
             df_temp = pd.concat([df, df_temp])            
             df = df_temp
 
@@ -69,68 +58,24 @@ class bitstamp:
             # time.sleep(1.01)
 
         df.drop_duplicates(subset='timestamp', inplace=True)
+
+        df = df.set_index('timestamp')
+        df.index = df.index.astype(int)
         df = df.astype(float)
         
-        # df['date'] = conv_time_v2(df['timestamp'])
-        df['date'] = pd.to_datetime(df['timestamp'], unit='s', utc=True)
+        # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
         
         return df
-    
-    def get_funding_rates(self, df_path=None, reverse='false', save_csv=True):
 
-        address = 'https://www.bitmex.com/api/v1/funding'
-        symbol = 'XBT'
-        query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': 0}        
+    def update(self, path=None):
+        df = pd.read_csv(path, index_col='timestamp')
 
-        r = self.get_(address, query)
+        last_timestamp = df.index[-1]
 
-        appended_data = []
+        updates = self.get_hist(start=last_timestamp)
 
-        # For updates
-        if df_path:
-            df_fundings = pd.read_csv(df_path)  # check if it is proper
-            appended_data.append(df_fundings)
+        df_final = pd.concat([df, updates])
 
-            last_time = df_fundings['timestamp'][-1:]
-            query['startTime'] = last_time             
+        df_final = df_final[~df_final.index.duplicated(keep='first')]
 
-        for i in range(10000):
-            r = self.get_(address, query)
-
-            df_fundings = pd.read_json(r.content)
-
-            appended_data.append(df_fundings)
-
-            if len(df_fundings) < query['count']:
-                print('completed!')
-                break
-
-            last_time = df_fundings['timestamp'][-1:]
-            query['startTime'] = last_time 
-
-        df_fundings = pd.concat(appended_data, ignore_index=True).drop_duplicates()
-        if save_csv:
-            df_fundings.to_csv('bitmex_fundings.csv', index=False)
-        else:
-            return df_fundings        
-
-    def price_funding_merger(self, df, df_fundings):
-        # TODO clean it, check it for things that might be missed
-
-        df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'])
-        df['date'] = pd.to_datetime(df['date'])
-
-        # a much better merger
-        df.set_index('date', inplace=True)
-        df_fundings.set_index('date', inplace=True)
-        df_fundings.pop('timestamp')
-
-        merged = df.join(df_fundings)
-        merged.fillna(method='ffill', inplace=True)
-
-        return merged
-
-    def shorts_longs(self):
-        # TODO
-        pass
-
+        df_final.to_csv(path)
