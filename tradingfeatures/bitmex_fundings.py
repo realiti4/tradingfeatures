@@ -14,7 +14,7 @@ class bitmex:
         # Bitmex remaining limit
         if 'x-ratelimit-remaining' in r.headers:
             if int(r.headers['x-ratelimit-remaining']) <= 1:
-                print('sleeping...')
+                print('bitmex api is sleeping...')
                 time.sleep(61)
         return r
     

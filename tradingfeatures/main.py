@@ -35,17 +35,19 @@ class base_v2:
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
 
-    def get(self, limit=10000):
-        df_bitfinex = self.bitfinex.get(10000)
-        df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
+    def get(self, limit=1000):
+        df_bitfinex = self.bitfinex.get(10000).set_index('timestamp')
+        df_bitstamp = self.bitstamp.get(query={'step': 3600, 'limit': 1000}).set_index('timestamp')
+        # df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
 
-        merged = self.bitmex.price_funding_merger(df_bitfinex, df_bitmex)
+        self.df1_updated = df_bitfinex[-limit:]
+        self.df2_updated = df_bitstamp[-limit:]
 
-        merged = merged[self.columns]
+        merged = self.uber_get(save=False, update=True, fundings=True)        
 
         return merged.to_numpy()
         
-    def uber_get(self, path, fundings=False, date=True, save=True, update=False):
+    def uber_get(self, path='', fundings=False, date=True, save=True, update=False):
         if update:
             df1 = self.df1_updated
             df2 = self.df2_updated
