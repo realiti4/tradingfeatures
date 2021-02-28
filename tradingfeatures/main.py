@@ -45,7 +45,7 @@ class base_v2:
 
         merged = self.uber_get(save=False, update=True, fundings=True)        
 
-        return merged.to_numpy()
+        return merged[self.columns_final].to_numpy()
         
     def uber_get(self, path='', fundings=False, date=True, save=True, update=False):
         if update:
