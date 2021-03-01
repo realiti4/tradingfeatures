@@ -5,6 +5,7 @@ import pandas as pd
 from tradingfeatures import bitfinex
 from tradingfeatures import bitstamp
 from tradingfeatures import bitmex
+from tradingfeatures import google_trends
 
 
 class base:
@@ -35,7 +36,7 @@ class base_v2:
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
 
-    def get(self, limit=1000):
+    def eval_get(self, limit=1000):
         df_bitfinex = self.bitfinex.get(10000).set_index('timestamp')
         df_bitstamp = self.bitstamp.get(query={'step': 3600, 'limit': 1000}).set_index('timestamp')
         # df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
