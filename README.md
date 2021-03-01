@@ -6,6 +6,10 @@ A useful tool to get market history and other features while respecting api limi
 
     pip install tradingfeatures
 
+or	
+
+    pip install git+https://github.com/realiti4/pip-upgrade.git@master --upgrade
+
 ## Example
 
 ### To get current history(max 10000)
