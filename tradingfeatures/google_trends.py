@@ -15,7 +15,7 @@ class google_trends:
 
         self.kw_list = kw_list
 
-    def get(self, date_start, date_end=None):
+    def get(self, date_start, date_end=None, sleep=60):
         if date_end is None:
             date_end = datetime.datetime.utcfromtimestamp(self.current_time())
 
@@ -26,7 +26,7 @@ class google_trends:
             self.kw_list, 
             year_start=date_start.year, month_start=date_start.month, day_start=date_start.day, hour_start=date_start.hour, 
             year_end=date_end.year, month_end=date_end.month, day_end=date_end.day, hour_end=date_end.hour, 
-            cat=0, geo='', gprop='', sleep=60)
+            cat=0, geo='', gprop='', sleep=sleep)
 
         return df_temp
 
@@ -46,6 +46,14 @@ class google_trends:
         df_temp.pop('isPartial')
         df_temp.columns = ['google_trends']
 
+        # temp check
+        df_temp_hour = datetime.datetime.utcfromtimestamp(df_temp.index[-1]).hour
+        current_hour = datetime.datetime.utcfromtimestamp(self.current_time()).hour
+
+        if not df_temp_hour == current_hour:            
+            with open("google_trends_log.txt", "a") as log_file:
+                log_file.write(f"Warning couldn't get google trends data! Time: {datetime.datetime.now()}\n")
+        
         df = pd.concat([df, df_temp])
         df = df[~df.index.duplicated(keep='first')]
         

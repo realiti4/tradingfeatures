@@ -1,5 +1,6 @@
 import time
 import requests
+import numpy as np
 import pandas as pd
 
 from tradingfeatures import bitfinex
@@ -12,7 +13,7 @@ class base:
 
     def __init__(self):
         self.bitfinex = bitfinex()
-        self.bitmex = bitmex()
+        self.bitmex = bitmex()        
 
         self.columns = ['close', 'low', 'high', 'volume', 'fundingRate']
 
@@ -32,6 +33,7 @@ class base_v2:
         self.bitfinex = bitfinex()
         self.bitstamp = bitstamp()
         self.bitmex = bitmex()
+        self.google_trends = google_trends()
 
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
@@ -44,11 +46,12 @@ class base_v2:
         self.df1_updated = df_bitfinex[-limit:]
         self.df2_updated = df_bitstamp[-limit:]
 
-        merged = self.uber_get(save=False, update=True, fundings=True)        
+        merged = self.uber_get(save=False, update=True, fundings=True, trends=False)        
 
-        return merged[self.columns_final].to_numpy()
+        return merged
+        # return merged[self.columns_final].to_numpy()
         
-    def uber_get(self, path='', fundings=False, date=True, save=True, update=False):
+    def uber_get(self, path='', fundings=False, trends=False, date=True, save=True, update=False):
         if update:
             df1 = self.df1_updated
             df2 = self.df2_updated
@@ -79,6 +82,7 @@ class base_v2:
         if date:
             df_final['date'] = pd.to_datetime(df_final.index, unit='s', utc=True)
             
+        # Extras
         if fundings:
             final_columns = self.columns
             final_columns.append('fundingRate')
@@ -87,6 +91,13 @@ class base_v2:
             
             merged = self.bitmex.price_funding_merger(df_final, df_bitmex)
             df_final = merged[final_columns]
+
+        if trends:
+            df_trends = self.google_trends.update('uber_data')
+            df_final = df_final.join(df_trends)
+
+            df_final['google_trends'].replace(0, np.nan, inplace=True)
+            df_final['google_trends'] = df_final['google_trends'].astype(float).interpolate()
             
         return df_final
         
