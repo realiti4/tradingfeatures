@@ -8,7 +8,7 @@ A useful tool to get market history and other features while respecting api limi
 
 or	
 
-    pip install git+https://github.com/realiti4/pip-upgrade.git@master --upgrade
+    pip install git+https://github.com/realiti4/tradingfeatures.git@master --upgrade
 
 ## Example
 
