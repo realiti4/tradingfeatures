@@ -65,8 +65,11 @@ class base_v2:
 
         df1.index = df1.index.astype(int)       # fix in bitfinex later
         
-        df1 = df1[self.columns]
-        df2 = df2[self.columns]
+        # df1 = df1[self.columns]     #.loc[:self.current_time()]
+        # df2 = df2[self.columns]
+
+        df1 = df1[self.columns].loc[:self.current_time()-1]
+        df2 = df2[self.columns].loc[:self.current_time()-1]
         
         if save:
             df1.to_csv(path + '/bitfinex_1h.csv')
@@ -120,6 +123,9 @@ class base_v2:
         updated = self.uber_get(path, fundings, update=True)
         
         updated[:-1].to_csv(path + '/merged_1h.csv')
+
+    def current_time(self):        
+        return int((time.time() // 3600) * 3600)     # Hourly current time
 
 # base = base()
 
