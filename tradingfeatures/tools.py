@@ -28,7 +28,8 @@ def column_order(df, order):
 
 class bitfinex:
     def __init__(self):
-        self.columns = ['timestamp', 'open', 'low', 'high', 'close', 'volume']
+        # self.columns = ['timestamp', 'open', 'low', 'high', 'close', 'volume']
+        self.columns = ['timestamp', 'open', 'close', 'high', 'low', 'volume']
 
         self.times_dict = {'5m': 5, '15m': 15, '30m': 30, '1h': 60, '3h': 180, '6h': 360, '12h': 720}
 
