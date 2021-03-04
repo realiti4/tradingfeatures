@@ -31,6 +31,7 @@ class base_v2:
 
     def __init__(self):
         self.bitfinex = bitfinex()
+        self.bitfinex_wrong = bitfinex(wrong_columns=True)      # Wrong order, keeping for old saved models
         self.bitstamp = bitstamp()
         self.bitmex = bitmex()
         self.google_trends = google_trends()
@@ -38,8 +39,11 @@ class base_v2:
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
 
-    def eval_get(self, limit=1000):
-        df_bitfinex = self.bitfinex.get(10000).set_index('timestamp')
+    def eval_get(self, limit=1000, wrong_columns=False):
+        if wrong_columns:
+            df_bitfinex = self.bitfinex_wrong.get(10000).set_index('timestamp')
+        else:
+            df_bitfinex = self.bitfinex.get(10000).set_index('timestamp')
         df_bitstamp = self.bitstamp.get(query={'step': 3600, 'limit': 1000}).set_index('timestamp')
         # df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
 
@@ -57,10 +61,9 @@ class base_v2:
             df2 = self.df2_updated
         else:
             df1 = self.bitfinex.get_hist('1h').set_index('timestamp')
-            df2 = self.bitstamp.get_hist().set_index('timestamp')
+            df2 = self.bitstamp.get_hist()
 
-        df1.index = df1.index.astype(int)
-        # df2.index = df2.index.astype(int)
+        df1.index = df1.index.astype(int)       # fix in bitfinex later
         
         df1 = df1[self.columns]
         df2 = df2[self.columns]
@@ -99,9 +102,12 @@ class base_v2:
             df_final['google_trends'].replace(0, np.nan, inplace=True)
             df_final['google_trends'] = df_final['google_trends'].astype(float).interpolate()
             
+        if save:
+            df_final.to_csv(path + '/merged_final.csv')
+        
         return df_final
         
-    def uber_update(self, path, fundings):
+    def uber_update(self, path, fundings=False):
         bitfinex_path = path + '/bitfinex_1h.csv'
         bitstamp_path = path + '/bitstamp_1h.csv'         
     
@@ -113,7 +119,7 @@ class base_v2:
         
         updated = self.uber_get(path, fundings, update=True)
         
-        updated.to_csv(path + '/merged_1h.csv')
+        updated[:-1].to_csv(path + '/merged_1h.csv')
 
 # base = base()
 

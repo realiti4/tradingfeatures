@@ -27,9 +27,12 @@ def column_order(df, order):
     return df
 
 class bitfinex:
-    def __init__(self):
-        # self.columns = ['timestamp', 'open', 'low', 'high', 'close', 'volume']
-        self.columns = ['timestamp', 'open', 'close', 'high', 'low', 'volume']
+    def __init__(self, wrong_columns=False):
+        if wrong_columns:
+            # Wrong order that I accidently trained
+            self.columns = ['timestamp', 'open', 'low', 'high', 'close', 'volume']
+        else:
+            self.columns = ['timestamp', 'open', 'close', 'high', 'low', 'volume']
 
         self.times_dict = {'5m': 5, '15m': 15, '30m': 30, '1h': 60, '3h': 180, '6h': 360, '12h': 720}
 
@@ -43,7 +46,7 @@ class bitfinex:
         # TODO 500 reponse handling
         if str(r.status_code).startswith('5'):
             r.raise_for_status()
-
+        
         data = r.json()
         data.reverse()
 
