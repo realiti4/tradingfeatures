@@ -42,7 +42,7 @@ class bitfinex:
         # symbol = 'tBTCUSD'
         # symbol = 'tETHUSD'
 
-        r = requests.get(f'https://api-pub.bitfinex.com/v2/candles/trade:{timeframe}:{symbol}/hist', params=query)
+        r = requests.get(f'https://api-pub.bitfinex.com/v2/candles/trade:{timeframe}:{symbol}/hist', params=query, timeout=60)
         # TODO 500 reponse handling
         if str(r.status_code).startswith('5'):
             r.raise_for_status()

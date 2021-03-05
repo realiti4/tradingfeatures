@@ -63,10 +63,7 @@ class base_v2:
             df1 = self.bitfinex.get_hist('1h').set_index('timestamp')
             df2 = self.bitstamp.get_hist()
 
-        df1.index = df1.index.astype(int)       # fix in bitfinex later
-        
-        # df1 = df1[self.columns]     #.loc[:self.current_time()]
-        # df2 = df2[self.columns]
+        df1.index = df1.index.astype(int)       # fix this in bitfinex later        
 
         df1 = df1[self.columns].loc[:self.current_time()-1]
         df2 = df2[self.columns].loc[:self.current_time()-1]

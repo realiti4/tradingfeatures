@@ -29,7 +29,7 @@ class bitstamp:
         if query is None:
             query = {'start': start, 'end': end, 'step': 3600, 'limit': 1000}        
         
-        r = requests.get(address, params=query)
+        r = requests.get(address, params=query, timeout=60)
         if r.status_code != 200:    # Bad response handler
             print(r.json())
             r.raise_for_status()
