@@ -19,5 +19,5 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     packages=["tradingfeatures"],
-    install_requires=["pandas", "requests"],
+    install_requires=["numpy", "pandas", "requests", "pytrends"],
 )
