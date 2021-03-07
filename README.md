@@ -1,5 +1,5 @@
 # tradingfeatures
-A useful tool to get market history and other features while respecting api limits.
+A useful tool to downlaod market history from popular exchanges.
 
 
 ## Installation
@@ -11,32 +11,40 @@ or
     pip install git+https://github.com/realiti4/tradingfeatures.git@master --upgrade
 
 ## Example
+You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. Currently supported:
 
-### To get current history(max 10000)
+* Bitfinex
+* Bitstamp
 
-    from tradingfeatures import bitfinex
+### Get most recent history with .get()
+
+    import pandas as pd
+    from tradingfeatures import bitfinex, bitstamp
 
     bitfinex = bitfinex()
 
-    bitfinex.get(1000)
+    df = bitfinex.get()
 
-### Download all available history
-Bitfinex limits most recent history call to 10000. If you would like get older data it is even more stricter. But you can download all history in 2 lines with this tool easily under 5-10 minutes while respecting Bitfinex's api call limits. 
+This is useful to get most recent history. But limit is 10000 for Bitfinex and 1000 for Bitstamp.
 
-    from tradingfeatures import bitfinex
-    bitfinex = bitfinex()
+### Download all available history with .get_history()
+The tool will download all avaliable history while respesting request per minute limits. Using it easy, and it takes couple of minutes for 1h data.
 
-    df = bitfinex.get_hist('1h')
-    df.to_csv('bitfinex_1h.csv', index=False)
+    import pandas as pd
+    from tradingfeatures import bitfinex, bitstamp
+
+    bitstamp = bitstamp()
     
-    df = bitfinex.get_hist('30m', start=1464778000, end=int(time.time()))
-    df.to_csv('bitfinex_30m.csv', index=False)
+    df = bitstamp.get_hist()
+    df.to_csv('bitstamp_1h.csv') 
 
-By default it'll download the entire history and you don't need to pass 'start' and 'end'. But you can also specify any timestamp 'start=1464778000' and 'end=1564778000' etc. like above.
+### Updating a csv file with .update()
 
-### Updating a csv file
+    import pandas as pd
+    from tradingfeatures import bitfinex, bitstamp
 
-    bitfinex.update_csv('bitfinex_1h.csv', timeframes=['1h']
-    bitfinex.update_csv('bitfinex_5m.csv', timeframes=['5m', '3h']
+    bitstamp = bitstamp()
+    
+    bitstamp.update_csv('bitstamp.csv')    
 
-When updating you can pass multiple timeframes in a list to update all in once.
+Update takes a path variable to csv file and updates it.
