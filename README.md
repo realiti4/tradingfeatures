@@ -1,5 +1,5 @@
 # tradingfeatures
-A useful tool to get market history and other features while respecting api limits.
+A useful tool to downlaod market history from popular exchanges.
 
 
 ## Installation
