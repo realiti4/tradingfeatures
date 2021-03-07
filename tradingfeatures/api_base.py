@@ -18,8 +18,8 @@ class apiBase:
         r = requests.get(address, params=params, timeout=timeout)
 
         if r.status_code != 200:
-            if str(r.status_code).startswith('5'):
-                r.raise_for_status()
+            # if str(r.status_code).startswith('5'):
+            #     r.raise_for_status()
 
             tries = 4
             retry_after = 10
@@ -51,7 +51,7 @@ class apiBase:
 
         df = pd.DataFrame(columns=['high', 'timestamp', 'volume', 'low', 'close', 'open'])
 
-        print(f'  Downloading {self.name}')
+        print(f'\n  Downloading {self.name}')
 
         for i in range(steps):
             start_batch = start + (interval*i*self.per_step)
@@ -60,7 +60,7 @@ class apiBase:
                 df_temp = self.get(start=str(start_batch), end=str(end_batch))
             except Exception as e:
                 print(e)
-                print('hata!', start_batch, end_batch)
+                print('error between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
             df_temp = pd.concat([df, df_temp])            
