@@ -51,11 +51,13 @@ class apiBase:
 
         df = pd.DataFrame(columns=['high', 'timestamp', 'volume', 'low', 'close', 'open'])
 
-        print(f'\n  Downloading {self.name}')
+        print(f'  Downloading {self.name}')
 
         for i in range(steps):
             start_batch = start + (interval*i*self.per_step)
             end_batch = start_batch + (interval*self.per_step)
+            if end_batch >= end:
+                end_batch = end
             try:
                 df_temp = self.get(start=str(start_batch), end=str(end_batch))
             except Exception as e:
@@ -76,6 +78,7 @@ class apiBase:
         df.index = df.index.astype(int)
         df = df.astype(float)
         
+        print(f'\nCompleted: {self.name}')
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
         
         return df
