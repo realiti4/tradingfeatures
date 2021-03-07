@@ -12,7 +12,7 @@ class bitstamp(apiBase):
         super(bitstamp, self).__init__(
             name = 'bitstamp_1h',
             per_step = 1000,
-            sleep = 0.7,
+            sleep = 0,
         )
 
     def get(self, start=1364778000, end=int(time.time()), query=None):
