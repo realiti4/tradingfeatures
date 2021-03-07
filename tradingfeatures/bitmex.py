@@ -15,7 +15,7 @@ class bitmex:
         # Bitmex remaining limit
         if 'x-ratelimit-remaining' in r.headers:
             if int(r.headers['x-ratelimit-remaining']) <= 1:
-                print('bitmex api is sleeping...')
+                print('reached the rate limit, bitmex api is sleeping...')
                 time.sleep(61)
         return r
     
@@ -61,22 +61,6 @@ class bitmex:
             return df_fundings        
 
     def price_funding_merger(self, df, df_fundings):
-        # TODO clean it, check it for things that might be missed
-
-        # df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'])
-        # df['date'] = pd.to_datetime(df['date'])
-
-        # Use timestamp as index
-        # df.set_index('timestamp', inplace=True)
-        # df.index = df.index.as_type(int)
-        # df_fundings.set_index('timestamp', inplace=True)
-        # df_fundings.index = df_fundings.index.as_type(int)
-        
-        # # a much better merger
-        # df.set_index('date', inplace=True)
-        # df_fundings.set_index('date', inplace=True)
-        # df_fundings.pop('timestamp')
-
         merged = df.join(df_fundings)
         merged.fillna(method='ffill', inplace=True)
 

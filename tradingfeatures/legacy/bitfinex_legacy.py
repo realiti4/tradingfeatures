@@ -26,7 +26,7 @@ def column_order(df, order):
     df = df[[df.columns[i] for i in order]]
     return df
 
-class bitfinex:
+class bitfinexLegacy:
     def __init__(self, wrong_columns=False):
         if wrong_columns:
             # Wrong order that I accidently trained

@@ -9,7 +9,7 @@ from tradingfeatures import bitmex
 from tradingfeatures import google_trends
 
 
-class base_v2:
+class base:
 
     def __init__(self):
         self.bitfinex = bitfinex()
@@ -42,10 +42,11 @@ class base_v2:
             df1 = self.df1_updated
             df2 = self.df2_updated
         else:
-            df1 = self.bitfinex.get_hist('1h').set_index('timestamp')
+            # df1 = self.bitfinex.get_hist('1h').set_index('timestamp')
+            df1 = self.bitfinex.get_hist()
             df2 = self.bitstamp.get_hist()
 
-        df1.index = df1.index.astype(int)       # fix this in bitfinex later        
+        # df1.index = df1.index.astype(int)       # fix this in bitfinex later
 
         df1 = df1[self.columns].loc[:self.current_time()-1]
         df2 = df2[self.columns].loc[:self.current_time()-1]
@@ -82,18 +83,19 @@ class base_v2:
             df_final = df_final.join(df_trends)
 
             df_final['google_trends'].replace(0, np.nan, inplace=True)
-            df_final['google_trends'] = df_final['google_trends'].astype(float).interpolate()
-            
+            df_final['google_trends'] = df_final['google_trends'].astype(float).interpolate()            
+        
         if save:
             df_final.to_csv(path + '/merged_final.csv')
         
         return df_final
         
-    def uber_update(self, path, fundings=False):
+    def uber_update(self, path, fundings=True):
         bitfinex_path = path + '/bitfinex_1h.csv'
         bitstamp_path = path + '/bitstamp_1h.csv'         
     
-        self.bitfinex.update_csv(bitfinex_path, alternative_mode=True)
+        # self.bitfinex.update_csv(bitfinex_path, alternative_mode=True)
+        self.bitfinex.update(bitfinex_path)
         self.bitstamp.update(bitstamp_path)
         
         self.df1_updated = pd.read_csv(bitfinex_path, index_col='timestamp')
@@ -106,8 +108,3 @@ class base_v2:
     def current_time(self):        
         return int((time.time() // 3600) * 3600)     # Hourly current time
 
-# base = base()
-
-# test = base.get()
-
-# test.to_csv('testtest.csv', index=False)
