@@ -1,5 +1,6 @@
 import time
 import requests
+import numpy as np
 import pandas as pd
 
 
@@ -51,6 +52,9 @@ class bitmex:
             query['startTime'] = last_time 
 
         df_fundings = pd.concat(appended_data, ignore_index=True).drop_duplicates()
+        df_fundings['timestamp'] = df_fundings.timestamp.values.astype(np.int64) // 10 ** 9
+        # df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'], unit='s', utc=True)
+        df_fundings.set_index('timestamp', inplace=True)
         if save_csv:
             df_fundings.to_csv('bitmex_fundings.csv', index=False)
         else:
@@ -59,13 +63,19 @@ class bitmex:
     def price_funding_merger(self, df, df_fundings):
         # TODO clean it, check it for things that might be missed
 
-        df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'])
-        df['date'] = pd.to_datetime(df['date'])
+        # df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'])
+        # df['date'] = pd.to_datetime(df['date'])
 
-        # a much better merger
-        df.set_index('date', inplace=True)
-        df_fundings.set_index('date', inplace=True)
-        df_fundings.pop('timestamp')
+        # Use timestamp as index
+        # df.set_index('timestamp', inplace=True)
+        # df.index = df.index.as_type(int)
+        # df_fundings.set_index('timestamp', inplace=True)
+        # df_fundings.index = df_fundings.index.as_type(int)
+        
+        # # a much better merger
+        # df.set_index('date', inplace=True)
+        # df_fundings.set_index('date', inplace=True)
+        # df_fundings.pop('timestamp')
 
         merged = df.join(df_fundings)
         merged.fillna(method='ffill', inplace=True)
