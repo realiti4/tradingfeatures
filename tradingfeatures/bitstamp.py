@@ -15,6 +15,8 @@ class bitstamp(apiBase):
             sleep = 0,
         )
 
+        self.base_address = 'https://www.bitstamp.net/api/v2/'
+
     def get(self,
             limit = 1000,
             address = None,

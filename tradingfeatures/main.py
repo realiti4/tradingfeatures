@@ -5,7 +5,7 @@ import pandas as pd
 
 from tradingfeatures import bitfinex
 from tradingfeatures import bitstamp
-from tradingfeatures import bitmex
+from tradingfeatures import bitmex, bitmex_v2
 from tradingfeatures import google_trends
 
 
@@ -16,6 +16,7 @@ class base:
         self.bitfinex_wrong = bitfinex(wrong_columns=True)      # Wrong order, keeping for old saved models
         self.bitstamp = bitstamp()
         self.bitmex = bitmex()
+        self.bitmex_v2 = bitmex_v2()
         self.google_trends = google_trends()
 
         self.columns = ['open', 'low', 'high', 'close', 'volume']
@@ -37,7 +38,7 @@ class base:
         return merged
         # return merged[self.columns_final].to_numpy()
         
-    def uber_get(self, path='', fundings=False, trends=False, date=True, save=True, update=False):
+    def uber_get(self, path='', fundings=False, trends=False, date=True, save=True, update=False, new_api=False):
         if update:
             df1 = self.df1_updated
             df2 = self.df2_updated
@@ -73,9 +74,13 @@ class base:
             final_columns = self.columns
             final_columns.append('fundingRate')
         
-            df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
-            
-            merged = self.bitmex.price_funding_merger(df_final, df_bitmex)
+            if new_api:
+                df_bitmex = self.bitmex_v2.get_fundings()
+                merged = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
+            else:
+                df_bitmex = self.bitmex.get_funding_rates(save_csv=False)            
+                merged = self.bitmex.price_funding_merger(df_final, df_bitmex)
+
             df_final = merged[final_columns]
 
         if trends:

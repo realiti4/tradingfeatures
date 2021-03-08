@@ -48,18 +48,17 @@ class apiBase:
         r.raise_for_status()
 
     def get_hist(self,
-            get=None,      # Takes a get function                     
-            start=None, 
+            get = None,      # Takes a get function                     
+            start = None, 
             end = None,
             name = None,
             columns = None,
             interval = '1h'
-            ):
-        
-        name = f'{name}_{interval}'
+            ):      
 
-        # init
+        # init        
         get = get or self.get
+        name = f'{name}_{interval}'
         columns = columns or self.default_columns
         start = start or 1364778000
         end = end or int(time.time())

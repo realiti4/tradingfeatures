@@ -14,6 +14,8 @@ class bitmex_v2(apiBase):
             per_step = 500,
             sleep = 0,
         )
+
+        self.base_address = 'https://www.bitmex.com/api/v1/'
     
     def get(self,
             address = None,
@@ -23,7 +25,8 @@ class bitmex_v2(apiBase):
             return_r = False,
             ):
 
-        address_funding = address or 'https://www.bitmex.com/api/v1/funding'
+        address = address or 'funding'
+        address = self.base_address + address
         symbol = 'XBT'
 
         start, end = self.to_date(start), self.to_date(end)
@@ -31,7 +34,7 @@ class bitmex_v2(apiBase):
         if query is None:
             query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': start}
 
-        r = self.response_handler(address_funding, query)
+        r = self.response_handler(address, query)
         # Bitmex remaining limit
         if 'x-ratelimit-remaining' in r.headers:
             if int(r.headers['x-ratelimit-remaining']) <= 1:
@@ -57,7 +60,7 @@ class bitmex_v2(apiBase):
         )
 
         # Recent funding
-        address = 'https://www.bitmex.com/api/v1/instrument'
+        address = 'instrument'
         r_current = self.get(address, query={'symbol': 'XBT'}, return_r=True)
         current_data = r_current.json()[0]
 
@@ -78,7 +81,7 @@ class bitmex_v2(apiBase):
         df_empty = pd.DataFrame(index=aranged_array)
 
         df_fundings = df_empty.join(df_fundings)
-        df_fundings = df_empty.join(df_fundings).fillna(method='bfill', limit=24)   # can remove limit
+        df_fundings = df_empty.join(df_fundings).fillna(method='bfill')   # can remove limit
         # df_fundings['fundingRate'].replace(0, 0.0001, inplace=True)     # Check this
         
         merged = df.join(df_fundings)
