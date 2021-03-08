@@ -1,5 +1,6 @@
 import time
 import requests
+import numpy as np
 import pandas as pd
 
 from datetime import datetime
@@ -11,8 +12,16 @@ class apiBase:
         self.per_step = per_step
         self.sleep = sleep
 
+        self.default_columns = ['high', 'timestamp', 'volume', 'low', 'close', 'open']
+
     def get(self, *args, **kwargs):
         raise NotImplementedError
+
+    def interval_check(self, interval):
+        if 'h' in interval:
+            return int(interval.split('h')[0]) * 3600
+        else:
+            raise Exception('Only hours supportted right now')
 
     def response_handler(self, address, params, timeout=60):
         r = requests.get(address, params=params, timeout=timeout)
@@ -38,41 +47,49 @@ class apiBase:
 
         r.raise_for_status()
 
-    def get_hist(self, start=1364778000, end=int(time.time()), interval='1h'):
-        # if timeframe not in self.times_dict:
-        #     raise Exception('enter a valid timeframe')
+    def get_hist(self,
+            get,      # Takes a get function                     
+            start, 
+            end = None,
+            name = None,
+            columns = None,
+            interval = '1h'
+            ):
+        
+        name = f'{name}_{interval}'
+        columns = columns or self.default_columns
+        end = end or int(time.time())
 
-        # minutes = self.times_dict[timeframe]
-        minutes = 60
-        interval = 60 * minutes        
+        interval = self.interval_check(interval)
 
         total_entries = (end - start) // interval
         steps = (total_entries // self.per_step) + 1
 
-        df = pd.DataFrame(columns=['high', 'timestamp', 'volume', 'low', 'close', 'open'])
+        df = pd.DataFrame(columns=columns)
 
-        print(f'  Downloading {self.name}')
-
+        print(f'  Downloading {name}')
+        
         for i in range(steps):
             start_batch = start + (interval*i*self.per_step)
             end_batch = start_batch + (interval*self.per_step)
             if end_batch >= end:
                 end_batch = end
             try:
-                df_temp = self.get(start=str(start_batch), end=str(end_batch))
+                df_temp = get(start=str(start_batch), end=str(end_batch))
             except Exception as e:
                 print(e)
                 print('error between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
-            df_temp = pd.concat([df, df_temp])            
+            df_temp = pd.concat([df, df_temp])
             df = df_temp
 
             print('\r' + f'  {i} of {steps}', end='')
             # print(f'  {i} of {steps}')
             time.sleep(self.sleep)
 
-        df.drop_duplicates(subset='timestamp', inplace=True)
+        df = df[columns]
+        df = df.drop_duplicates(subset='timestamp')
 
         df = df.set_index('timestamp')
         df.index = df.index.astype(int)
@@ -95,3 +112,9 @@ class apiBase:
         df_final = df_final[~df_final.index.duplicated(keep='first')]
 
         df_final.to_csv(path)
+
+    def to_ts(self, df):   # Convert datetime to timestamp        
+        return df.values.astype(np.int64) // 10 ** 9
+
+    def to_date(self, x):       # Convert timestamp to datetime
+        return pd.to_datetime(x, unit='s', utc=True)
