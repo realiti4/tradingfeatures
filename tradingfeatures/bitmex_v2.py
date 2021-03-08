@@ -51,12 +51,12 @@ class bitmex_v2(apiBase):
     def get_test(self):
         self.get(address='instrument', query={'symbol': 'XBT'})
 
-    def get_fundings(self, *args, **kwargs):
+    def get_fundings(self, start=1463227200, *args, **kwargs):
 
         df_fundings = super(bitmex_v2, self).get_hist(
             name='bitmex_funding',
             get=self.get,
-            start=1463227200,
+            start=start,
             columns=['timestamp', 'fundingRate', 'fundingRateDaily'],
             interval='8h',
             *args, **kwargs

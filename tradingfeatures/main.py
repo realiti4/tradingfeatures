@@ -74,7 +74,8 @@ class base:
             final_columns.append('fundingRate')
         
             if new_api:
-                df_bitmex = self.bitmex_v2.get_fundings()  
+                start_timestamp = df_final.index[0]
+                df_bitmex = self.bitmex_v2.get_fundings(start_timestamp)  
                 merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
                 if save:
                     df_bitmex.to_csv(path + '/bitmex_fundings.csv')
