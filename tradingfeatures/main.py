@@ -38,7 +38,7 @@ class base:
         return merged
         # return merged[self.columns_final].to_numpy()
         
-    def uber_get(self, path='', fundings=False, trends=False, date=True, save=True, update=False, new_api=False):
+    def uber_get(self, path, fundings=False, trends=False, date=True, save=True, update=False, new_api=False):
         if update:
             df1 = self.df1_updated
             df2 = self.df2_updated
@@ -75,8 +75,10 @@ class base:
             final_columns.append('fundingRate')
         
             if new_api:
-                df_bitmex = self.bitmex_v2.get_fundings()
-                merged = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
+                df_bitmex = self.bitmex_v2.get_fundings()  
+                merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
+                if save:
+                    df_bitmex.to_csv(path + '/bitmex_fundings.csv')
             else:
                 df_bitmex = self.bitmex.get_funding_rates(save_csv=False)            
                 merged = self.bitmex.price_funding_merger(df_final, df_bitmex)

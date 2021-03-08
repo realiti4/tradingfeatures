@@ -37,6 +37,7 @@ class apiBase:
                     retry_after += int(r.headers['Retry-After'])
 
                 print(f'\nResponse: {r.status_code}, trying after {retry_after}secs')
+                # r.raise_for_status()
                 time.sleep(retry_after)
 
                 r = requests.get(address, params=params, timeout=timeout)

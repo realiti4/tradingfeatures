@@ -48,6 +48,9 @@ class bitmex_v2(apiBase):
 
         return df_fundings
 
+    def get_test(self):
+        self.get(address='instrument', query={'symbol': 'XBT'})
+
     def get_fundings(self, *args, **kwargs):
 
         df_fundings = super(bitmex_v2, self).get_hist(
@@ -86,4 +89,4 @@ class bitmex_v2(apiBase):
         
         merged = df.join(df_fundings)
 
-        return merged    
+        return merged, df_fundings   
