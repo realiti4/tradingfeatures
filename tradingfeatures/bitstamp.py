@@ -43,7 +43,6 @@ class bitstamp(apiBase):
 
     def get_hist(self, *args, **kwargs):
         return super(bitstamp, self).get_hist(            
-            get=self.get,
             start=1364778000,
             name=self.name,
             *args, **kwargs
