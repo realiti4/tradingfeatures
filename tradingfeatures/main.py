@@ -48,6 +48,7 @@ class base:
 
         # df1.index = df1.index.astype(int)       # fix this in bitfinex later
 
+        # Do not use moving hour
         df1 = df1[self.columns].loc[:self.current_time()-1]
         df2 = df2[self.columns].loc[:self.current_time()-1]
         

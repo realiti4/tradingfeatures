@@ -55,7 +55,8 @@ class apiBase:
             end = None,
             name = None,
             columns = None,
-            interval = '1h'
+            interval = '1h',
+            global_columns=True,
             ):      
 
         # init        
@@ -93,7 +94,8 @@ class apiBase:
             # print(f'  {i} of {steps}')
             time.sleep(self.sleep)
 
-        df = df[columns]
+        if global_columns:
+            df = df[columns]
         df = df.drop_duplicates(subset='timestamp')
 
         df = df.set_index('timestamp')
