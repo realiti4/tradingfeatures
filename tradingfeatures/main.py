@@ -42,24 +42,8 @@ class base:
             df = df[-limit:]
             datasets.append([api.name, df])
 
-        # self.bitstamp.get(query={'step': 3600, 'limit': 1000}).set_index('timestamp')
-
         merged = self.uber_get(datasets=datasets, save=False, fundings=True, trends=False, new_api=new_api)
         return merged
-
-        if wrong_columns:
-            df_bitfinex = self.bitfinex_wrong.get(10000).set_index('timestamp')
-        else:
-            df_bitfinex = self.bitfinex.get(10000).set_index('timestamp')
-        df_bitstamp = self.bitstamp.get(query={'step': 3600, 'limit': 1000}).set_index('timestamp')
-        # df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
-
-        self.df1_updated = df_bitfinex[-limit:]
-        self.df2_updated = df_bitstamp[-limit:]
-
-        merged = self.uber_get(save=False, update=True, fundings=True, trends=False, new_api=new_api)
-
-        return merged        
         
     def uber_get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, update=False, 
                 new_api=False):
@@ -68,8 +52,8 @@ class base:
             datasets = []
 
             for api in self.apis:
-                # hist = api.get_hist()
-                df = api.get().set_index('timestamp')
+                hist = api.get_hist()
+                # df = api.get().set_index('timestamp')
                 datasets.append([api.name, df])
 
         for i in range(len(datasets)):
@@ -133,19 +117,17 @@ class base:
         return df_final
         
     def uber_update(self, path, fundings=True):
-        bitfinex_path = path + '/bitfinex_1h.csv'
-        bitstamp_path = path + '/bitstamp_1h.csv'         
-    
-        # self.bitfinex.update_csv(bitfinex_path, alternative_mode=True)
-        self.bitfinex.update(bitfinex_path)
-        self.bitstamp.update(bitstamp_path)
-        
-        self.df1_updated = pd.read_csv(bitfinex_path, index_col='timestamp')
-        self.df2_updated = pd.read_csv(bitstamp_path, index_col='timestamp')
-        
-        updated = self.uber_get(path, fundings, update=True)
-        
-        updated[:-1].to_csv(path + '/merged_1h.csv')
+        datasets = []
+
+        for api in self.apis:
+            path_df = f'/{api.name}_1h.csv'
+            df = api.update(path_df)
+
+            datasets.append([api.name, df])
+
+        updated = self.uber_get(path, datasets=datasets, fundings=fundings)
+        updated.to_csv(path + '/merged_1h.csv')
+        return
 
     def current_time(self):        
         return int((time.time() // 3600) * 3600)     # Hourly current time

@@ -121,6 +121,7 @@ class apiBase:
         df_final = df_final[~df_final.index.duplicated(keep='first')]
 
         df_final.to_csv(path)
+        return df_final
 
     def to_ts(self, df):   # Convert datetime to timestamp        
         return df.values.astype(np.int64) // 10 ** 9
