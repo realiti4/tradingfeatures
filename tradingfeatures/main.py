@@ -45,17 +45,19 @@ class base:
         merged = self.uber_get(datasets=datasets, save=False, fundings=True, trends=False, new_api=new_api)
         return merged
         
-    def uber_get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, update=False, 
+    def uber_get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
                 new_api=False):
         
         if datasets is None:    # if dataset update, else download everything
             datasets = []
 
             for api in self.apis:
-                hist = api.get_hist()
-                # df = api.get().set_index('timestamp')
-                datasets.append([api.name, df])
-
+                df = api.get_hist()                
+                datasets.append([api.name, df])        
+        
+        assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
+        assert hasattr(datasets[0][0], 'get_hist')
+        
         for i in range(len(datasets)):
             datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
 
