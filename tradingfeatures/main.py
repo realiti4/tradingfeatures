@@ -34,7 +34,7 @@ class base:
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
 
-    def eval_get(self, limit=1000, new_api=False, wrong_columns=False):
+    def eval_get(self, limit=1000, new_api=False):
         datasets = []
 
         for api in self.apis:
