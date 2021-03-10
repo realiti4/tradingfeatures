@@ -18,8 +18,10 @@ class apiBase:
         raise NotImplementedError
 
     def interval_check(self, interval):
-        if 'h' in interval:
-            return int(interval.split('h')[0]) * 3600
+        if 'h' in interval:            
+            interval = int(interval.split('h')[0]) * 3600
+            minutes = int(interval / 60)
+            return interval, minutes
         else:
             raise Exception('Only hours supportted right now')
 
@@ -66,7 +68,7 @@ class apiBase:
         start = start or 1364778000
         end = end or int(time.time())
 
-        interval = self.interval_check(interval)
+        interval, minutes = self.interval_check(interval)
 
         total_entries = (end - start) // interval
         steps = (total_entries // self.per_step) + 1

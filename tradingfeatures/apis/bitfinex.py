@@ -24,7 +24,7 @@ class bitfinex(apiBase):
         self.times_dict = {'5m': 5, '15m': 15, '30m': 30, '1h': 60, '3h': 180, '6h': 360, '12h': 720}
 
     def get(self,
-            limit = None,
+            limit = 10000,
             address = None,
             query = None,
             start = None,
