@@ -109,7 +109,7 @@ class base:
         self.df1_updated = pd.read_csv(bitfinex_path, index_col='timestamp')
         self.df2_updated = pd.read_csv(bitstamp_path, index_col='timestamp')
         
-        updated = self.uber_get(path, fundings, update=True)
+        updated = self.uber_get(path, fundings=fundings, update=True)
         
         updated[:-1].to_csv(path + '/merged_1h.csv')
 
