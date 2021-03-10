@@ -1,5 +1,5 @@
 # tradingfeatures
-A useful tool to downlaod market history from popular exchanges.
+A useful tool to download market history from popular exchanges.
 
 
 ## Installation
