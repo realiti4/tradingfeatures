@@ -11,7 +11,7 @@ class okex(apiBase):
     def __init__(self):
         super(okex, self).__init__(
             name = 'okex',
-            per_step = 1000,
+            per_step = 300,
             sleep = 0,
         )
 
@@ -29,14 +29,14 @@ class okex(apiBase):
         address = address or f'api/swap/v3/instruments/{instrument_id}/history/candles'
         address = self.base_address + address
 
-        end = self.to_date(end)
-        end = end.isoformat()
-        end = end.split('+')[0] + '.000Z'
+        start, end = self.to_iso(start), self.to_iso(end)
 
         if query is None:
             query = {'end': end, 'limit': limit}
             if start is not None:
                 query['start'] = start
+
+        query = {'start': start, 'limit': limit}
         
         r = self.response_handler(address, params=query, timeout=60)
 
@@ -52,9 +52,15 @@ class okex(apiBase):
 
         return df
 
+    def to_iso(self, x):
+        x = self.to_date(x)
+        x = x.isoformat()
+        x = x.split('+')[0] + '.000Z'
+        return x
+    
     def get_hist(self, *args, **kwargs):
-        return super(bitstamp, self).get_hist(            
-            start=1364778000,
+        return super(okex, self).get_hist(            
+            start=1514778000,
             name=self.name,
             *args, **kwargs
         )
