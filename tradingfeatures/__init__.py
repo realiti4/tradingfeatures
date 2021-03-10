@@ -5,5 +5,5 @@ from tradingfeatures.google_trends import google_trends
 
 from tradingfeatures.legacy import *
 
-from tradingfeatures.main import base
+from tradingfeatures.main import uber
 

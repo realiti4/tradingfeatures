@@ -10,7 +10,7 @@ from tradingfeatures import binance
 from tradingfeatures import google_trends
 
 
-class base:
+class uber:
 
     def __init__(self,
         api_to_use=['bitfinex', 'bitstamp']
@@ -42,10 +42,10 @@ class base:
             df = df[-limit:]
             datasets.append([api.name, df])
 
-        merged = self.uber_get(datasets=datasets, save=False, fundings=True, trends=False, new_api=new_api)
+        merged = self.get(datasets=datasets, save=False, fundings=True, trends=False, new_api=new_api)
         return merged
         
-    def uber_get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
+    def get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
                 new_api=False):
         
         if datasets is None:    # if dataset update, else download everything
@@ -117,7 +117,7 @@ class base:
         
         return df_final
         
-    def uber_update(self, path, fundings=True):
+    def update(self, path, fundings=True):
         datasets = []
 
         for api in self.apis:
@@ -126,7 +126,7 @@ class base:
 
             datasets.append([api.name, df])
 
-        updated = self.uber_get(path, datasets=datasets, fundings=fundings)
+        updated = self.get(path, datasets=datasets, fundings=fundings)
         updated.to_csv(path + '/merged_1h.csv')
         return
 
