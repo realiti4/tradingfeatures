@@ -56,7 +56,6 @@ class base:
                 datasets.append([api.name, df])        
         
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
-        assert hasattr(datasets[0][0], 'get_hist')
         
         for i in range(len(datasets)):
             datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
