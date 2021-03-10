@@ -6,15 +6,27 @@ import pandas as pd
 from tradingfeatures import bitfinex
 from tradingfeatures import bitstamp
 from tradingfeatures import bitmex, bitmex_v2
+from tradingfeatures import binance
 from tradingfeatures import google_trends
 
 
 class base:
 
-    def __init__(self):
-        self.bitfinex = bitfinex()
-        self.bitfinex_wrong = bitfinex(wrong_columns=True)      # Wrong order, keeping for old saved models
-        self.bitstamp = bitstamp()
+    def __init__(self,
+        api_to_use=['bitfinex', 'bitstamp']
+        ):
+
+        self.apis_dict = {
+            'bitfinex': bitfinex(),
+            'bitfinex_wrong': bitfinex(wrong_columns=True),
+            'bitstamp': bitstamp(),
+            'bitmex': bitmex(),
+            'bitmex_v2': bitmex_v2(),
+            'binance': binance(),
+        }
+
+        self.apis = [self.apis_dict.get(key) for key in api_to_use]
+
         self.bitmex = bitmex()
         self.bitmex_v2 = bitmex_v2()
         self.google_trends = google_trends()
@@ -22,49 +34,55 @@ class base:
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
 
-    def eval_get(self, limit=1000, new_api=False, wrong_columns=False):
-        if wrong_columns:
-            df_bitfinex = self.bitfinex_wrong.get(10000).set_index('timestamp')
-        else:
-            df_bitfinex = self.bitfinex.get(10000).set_index('timestamp')
-        df_bitstamp = self.bitstamp.get(query={'step': 3600, 'limit': 1000}).set_index('timestamp')
-        # df_bitmex = self.bitmex.get_funding_rates(save_csv=False)
+    def eval_get(self, limit=1000, new_api=False):
+        datasets = []
 
-        self.df1_updated = df_bitfinex[-limit:]
-        self.df2_updated = df_bitstamp[-limit:]
+        for api in self.apis:
+            df = api.get().set_index('timestamp')
+            df = df[-limit:]
+            datasets.append([api.name, df])
 
-        merged = self.uber_get(save=False, update=True, fundings=True, trends=False, new_api=new_api)        
-
+        merged = self.uber_get(datasets=datasets, save=False, fundings=True, trends=False, new_api=new_api)
         return merged
         
-    def uber_get(self, path='', fundings=False, trends=False, date=True, save=True, update=False, new_api=False):
-        if update:
-            df1 = self.df1_updated
-            df2 = self.df2_updated
-        else:
-            # df1 = self.bitfinex.get_hist('1h').set_index('timestamp')
-            df1 = self.bitfinex.get_hist()
-            df2 = self.bitstamp.get_hist()
-
-        # df1.index = df1.index.astype(int)       # fix this in bitfinex later
-
-        # Do not use moving hour
-        df1 = df1[self.columns].loc[:self.current_time()-1]
-        df2 = df2[self.columns].loc[:self.current_time()-1]
+    def uber_get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, update=False, 
+                new_api=False):
         
+        if datasets is None:    # if dataset update, else download everything
+            datasets = []
+
+            for api in self.apis:
+                hist = api.get_hist()
+                # df = api.get().set_index('timestamp')
+                datasets.append([api.name, df])
+
+        for i in range(len(datasets)):
+            datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
+
         if save:
-            df1.to_csv(path + '/bitfinex_1h.csv')
-            df2.to_csv(path + '/bitstamp_1h.csv')
-        
-        df_temp = df1.join(df2, lsuffix='_bitfinex', rsuffix='_bitstamp')
+            for df in datasets:
+                name, df = df[0], df[1]
+                df.to_csv(path + f'/{name}_1h.csv')
+        if not merge:
+            return
+
+        # # And find a find to join more than 2 datasets each at a time. maybe an outer function might help
+        name_main, df_main = datasets[0]
+        for i in range(1, len(datasets)):
+            name = datasets[i][0]
+            df_join = datasets[i][1]
+            if i == 1:
+                df_main = df_main.join(df_join, lsuffix=f'_{name_main}', rsuffix=f'_{name}')
+            else:
+                df_main = df_main.join(df_join, rsuffix=f'_{name}')
 
         df_final = pd.DataFrame(columns=self.columns)
         
         for item in self.columns:
             if item == 'volume':
-                df_final[item] = df_temp.loc[:, df_temp.columns.str.contains(item)].sum(axis=1)
+                df_final[item] = df_main.loc[:, df_main.columns.str.contains(item)].sum(axis=1)
             else:
-                df_final[item] = df_temp.loc[:, df_temp.columns.str.contains(item)].mean(axis=1)
+                df_final[item] = df_main.loc[:, df_main.columns.str.contains(item)].mean(axis=1)
                 
         if date:
             df_final['date'] = pd.to_datetime(df_final.index, unit='s', utc=True)
@@ -99,19 +117,17 @@ class base:
         return df_final
         
     def uber_update(self, path, fundings=True):
-        bitfinex_path = path + '/bitfinex_1h.csv'
-        bitstamp_path = path + '/bitstamp_1h.csv'         
-    
-        # self.bitfinex.update_csv(bitfinex_path, alternative_mode=True)
-        self.bitfinex.update(bitfinex_path)
-        self.bitstamp.update(bitstamp_path)
-        
-        self.df1_updated = pd.read_csv(bitfinex_path, index_col='timestamp')
-        self.df2_updated = pd.read_csv(bitstamp_path, index_col='timestamp')
-        
-        updated = self.uber_get(path, fundings=fundings, update=True)
-        
-        updated[:-1].to_csv(path + '/merged_1h.csv')
+        datasets = []
+
+        for api in self.apis:
+            path_df = f'/{api.name}_1h.csv'
+            df = api.update(path_df)
+
+            datasets.append([api.name, df])
+
+        updated = self.uber_get(path, datasets=datasets, fundings=fundings)
+        updated.to_csv(path + '/merged_1h.csv')
+        return
 
     def current_time(self):        
         return int((time.time() // 3600) * 3600)     # Hourly current time
