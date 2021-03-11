@@ -43,12 +43,13 @@ class binance(apiBase):
         df = pd.DataFrame(result, columns=['open_time', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume',
                                     'number_of_trades', 'taker_base_asset_volume', 'taker_quote_asset_volume', 'ignore'])
 
+        df = df.astype(float)
         df['timestamp'] = df['open_time'].div(1000).astype(int)
         df.pop('open_time')
         df.pop('close_time')
         df.pop('ignore')
 
-        return df
+        return df.astype(float)
 
     def get_hist(self, *args, **kwargs):
         return super(binance, self).get_hist(

@@ -43,6 +43,11 @@ class uber:
             datasets.append([api.name, df])
 
         merged = self.get(datasets=datasets, save=False, fundings=True, trends=False, **kwargs)
+
+        # Fix for 0 and nan - check here again later
+        merged = merged.replace(0, np.nan)
+        merged = merged.interpolate()
+
         return merged
         
     def get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
