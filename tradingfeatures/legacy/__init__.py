@@ -1,2 +1,3 @@
 from tradingfeatures.legacy.bitfinex_legacy import bitfinexLegacy
 from tradingfeatures.legacy.bitstamp_legacy import bitstampLegacy
+from tradingfeatures.legacy.bitmex_legacy import bitmexLegacy

@@ -53,13 +53,15 @@ class apiBase:
         r.raise_for_status()
 
     def get_hist(self,
-            get = None,      # Takes a get function                     
+            get = None,      # Takes a get function
+            address = None,               
             start = None, 
             end = None,
             name = None,
             columns = None,
             interval = '1h',    # Don't use this for now, only 1h is supported
             global_columns=True,
+            interpolate=True,   # Should be ok to enable I guess, check later
             ):      
 
         # init        
@@ -84,7 +86,7 @@ class apiBase:
             if end_batch >= end:
                 end_batch = end
             try:
-                df_temp = get(start=str(start_batch), end=str(end_batch))
+                df_temp = get(address=address, start=str(start_batch), end=str(end_batch))
             except Exception as e:
                 print(e)
                 print('error between timestamps: ', start_batch, end_batch)
@@ -100,10 +102,15 @@ class apiBase:
         if global_columns:
             df = df[columns]
         df = df.drop_duplicates(subset='timestamp')
-
+        
         df = df.set_index('timestamp')
         df.index = df.index.astype(int)
         df = df.astype(float)
+
+        if interpolate:
+            # interpolate nan data
+            df.replace(0, np.nan, inplace=True)
+            df.interpolate(inplace=True)
         
         print(f'\nCompleted: {self.name}')
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)

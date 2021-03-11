@@ -6,7 +6,7 @@ import pandas as pd
 
 from tradingfeatures import bitfinex
 from tradingfeatures import bitstamp
-from tradingfeatures import bitmex, bitmex_v2
+from tradingfeatures import bitmexLegacy, bitmex
 from tradingfeatures import binance
 from tradingfeatures import google_trends
 
@@ -21,15 +21,15 @@ class uber:
             'bitfinex': bitfinex(),
             'bitfinex_wrong': bitfinex(wrong_columns=True),
             'bitstamp': bitstamp(),
+            'bitmex_legacy': bitmexLegacy(),
             'bitmex': bitmex(),
-            'bitmex_v2': bitmex_v2(),
             'binance': binance(),
         }
 
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
 
+        self.bitmex_legacy = bitmexLegacy()
         self.bitmex = bitmex()
-        self.bitmex_v2 = bitmex_v2()
         self.google_trends = google_trends()
 
         self.columns = ['open', 'low', 'high', 'close', 'volume']
@@ -52,13 +52,13 @@ class uber:
         return merged
         
     def get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
-                legacy_bitmex_api=False, experiment_binance=False):
+                legacy_bitmex_api=False, experiment_binance=False, **kwargs):
         
         if datasets is None:    # if dataset update, else download everything
             datasets = []
 
             for api in self.apis:
-                df = api.get_hist()                
+                df = api.get_hist(**kwargs)                
                 datasets.append([api.name, df])        
         
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
@@ -102,13 +102,14 @@ class uber:
             if not legacy_bitmex_api:
                 # read old bitmex data here when update
                 start_timestamp = df_final.index[0]
-                df_bitmex = self.bitmex_v2.get_fundings(start_timestamp)  
-                merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
+                df_bitmex = self.bitmex.get_fundings(start_timestamp, convert_funds=True)
+                merged = df_final.join(df_bitmex)
+                # merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
                 if save:
                     df_bitmex.to_csv(path + '/bitmex_fundings.csv')
             else:                                
-                df_bitmex = self.bitmex.get_funding_rates(save_csv=False)            
-                merged = self.bitmex.price_funding_merger(df_final, df_bitmex)
+                df_bitmex = self.bitmex_legacy.get_funding_rates(save_csv=False)            
+                merged = self.bitmex_legacy.price_funding_merger(df_final, df_bitmex)
 
             df_final = merged[final_columns]
 

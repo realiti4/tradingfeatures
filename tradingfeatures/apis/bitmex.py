@@ -3,72 +3,121 @@ import requests
 import numpy as np
 import pandas as pd
 
+from tradingfeatures import apiBase
 
-class bitmex:
 
-    def get_(self, address, query):
-        r = requests.get(address, params=query, timeout=60)
-        if r.status_code != 200:    # Bad response handler
-            print(r.json())
-            r.raise_for_status()
+class bitmex(apiBase):
+
+    def __init__(self):
+        super(bitmex, self).__init__(
+            name = 'bitmex',
+            per_step = 500,
+            sleep = 0,
+        )
+
+        self.base_address = 'https://www.bitmex.com/api/v1/'
+    
+    def get(self,
+            address = None,
+            query = None,
+            start = 1364778000,
+            end = int(time.time()),
+            interval = '1h',
+            return_r = False,
+            ):
+
+        address = address or '/trade/bucketed'
+        address = self.base_address + address
+        symbol = 'XBT'
+
+        start, end = self.to_date(start), self.to_date(end)
         
+        if query is None:
+            query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': start}
+            if '/trade' in address:
+                query['binSize'] = interval
+
+        r = self.response_handler(address, query)
         # Bitmex remaining limit
         if 'x-ratelimit-remaining' in r.headers:
             if int(r.headers['x-ratelimit-remaining']) <= 1:
-                print('reached the rate limit, bitmex api is sleeping...')
+                print('\nreached the rate limit, bitmex api is sleeping...')
                 time.sleep(61)
-        return r
-    
-    def get_funding_rates(self, df_path=None, reverse='false', save_csv=True):
+        if return_r:
+            return r
 
-        address = 'https://www.bitmex.com/api/v1/funding'
-        symbol = 'XBT'
-        query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': 0}        
+        df = pd.read_json(r.content)
+        df['timestamp'] = self.to_ts(df['timestamp'])
+        df.pop('symbol')
+        df = df.astype(float)
 
-        r = self.get_(address, query)
+        # int timestamp, and float convertion here
 
-        appended_data = []
+        return df
 
-        # For updates
-        if df_path:
-            df_fundings = pd.read_csv(df_path)  # check if it is proper
-            appended_data.append(df_fundings)
+    def get_hist(self, start=1423186000, *args, **kwargs):
+        return super(bitmex, self).get_hist(
+            address='/trade/bucketed',
+            start=start,
+            name=self.name,
+            *args, **kwargs
+        )
 
-            last_time = df_fundings['timestamp'][-1:]
-            query['startTime'] = last_time             
+    def get_quote(self, start=1423186000, *args, **kwargs):
+        return super(bitmex, self).get_hist(
+            address='/quote/bucketed',
+            start=start,
+            name=self.name,
+            *args, **kwargs
+        )
 
-        for i in range(10000):
-            r = self.get_(address, query)
+        address = '/quote/bucketed'
+        self.get(address='instrument', query={'symbol': 'XBT'})
 
-            df_fundings = pd.read_json(r.content)
+    def get_settlement(self):
+        return
 
-            appended_data.append(df_fundings)
+    def get_fundings(self, start=1463227200, convert_funds=False, *args, **kwargs):
+        df_fundings = super(bitmex, self).get_hist(
+            name='bitmex_funding',
+            address='funding',
+            start=start,
+            columns=['timestamp', 'fundingRate', 'fundingRateDaily'],
+            interval='8h',
+            *args, **kwargs
+        )
 
-            if len(df_fundings) < query['count']:
-                print('completed!')
-                break
+        # Recent funding
+        address = 'instrument'
+        r_current = self.get(address, query={'symbol': 'XBT'}, return_r=True)
+        current_data = r_current.json()[0]
 
-            last_time = df_fundings['timestamp'][-1:]
-            query['startTime'] = last_time 
+        funding_ts = current_data['fundingTimestamp']
+        funding_rate = current_data['fundingRate']
+        
+        df_recent_funding = pd.DataFrame([[funding_ts, funding_rate]], columns=['timestamp', 'fundingRate'])
+        df_recent_funding['timestamp'] = self.to_ts(pd.to_datetime(df_recent_funding['timestamp']))
+        df_recent_funding.set_index('timestamp', inplace=True)
 
-        df_fundings = pd.concat(appended_data, ignore_index=True).drop_duplicates()
-        df_fundings['timestamp'] = df_fundings.timestamp.values.astype(np.int64) // 10 ** 9
-        # df_fundings['date'] = pd.to_datetime(df_fundings['timestamp'], unit='s', utc=True)
-        df_fundings.set_index('timestamp', inplace=True)
-        if save_csv:
-            df_fundings.to_csv('bitmex_fundings.csv', index=False)
-        else:
-            return df_fundings        
+        df_final = pd.concat([df_fundings, df_recent_funding])
+        df_final = df_final[['fundingRate']]
 
-    def price_funding_merger(self, df, df_fundings):
-        merged = df.join(df_fundings)
-        merged.fillna(method='ffill', inplace=True)
+        if convert_funds:       # convert 8h to 1h and backfill
+            aranged_array = np.arange(df_final.index[0], df_final.index[-1] + 1, 3600)
+            df_empty = pd.DataFrame(index=aranged_array)
+            df_final = df_empty.join(df_final)
+            df_final = df_empty.join(df_final).fillna(method='bfill')
 
-        return merged
+        return df_final
 
-    def shorts_longs(self):
-        # TODO
-        pass
+    # def price_funding_merger(self, df, df_fundings):
+    #     aranged_array = np.arange(df_fundings.index[0], df_fundings.index[-1] + 1, 3600)
+    #     df_empty = pd.DataFrame(index=aranged_array)
 
+    #     df_fundings = df_empty.join(df_fundings)
+    #     df_fundings = df_empty.join(df_fundings).fillna(method='bfill')   # can remove limit
+    #     # df_fundings['fundingRate'].replace(0, 0.0001, inplace=True)     # Check this
+        
+    #     merged = df.join(df_fundings)
 
-# trading_features().get_funding_rates()
+    #     return merged, df_fundings   
