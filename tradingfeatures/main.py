@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 import numpy as np
@@ -99,12 +100,13 @@ class uber:
             final_columns.append('fundingRate')
         
             if not legacy_bitmex_api:
+                # read old bitmex data here when update
                 start_timestamp = df_final.index[0]
                 df_bitmex = self.bitmex_v2.get_fundings(start_timestamp)  
                 merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
                 if save:
                     df_bitmex.to_csv(path + '/bitmex_fundings.csv')
-            else:
+            else:                                
                 df_bitmex = self.bitmex.get_funding_rates(save_csv=False)            
                 merged = self.bitmex.price_funding_merger(df_final, df_bitmex)
 
@@ -128,17 +130,18 @@ class uber:
         
         return df_final
         
-    def update(self, path, fundings=True):
+    def update(self, path='uber_data', fundings=True):  # Fix path
+        working_directory = os.getcwd()
         datasets = []
 
         for api in self.apis:
-            path_df = f'/{api.name}_1h.csv'
+            path_df = path + f'/{api.name}_1h.csv'
             df = api.update(path_df)
 
             datasets.append([api.name, df])
 
         updated = self.get(path, datasets=datasets, fundings=fundings)
-        updated.to_csv(path + '/merged_1h.csv')
+        updated.to_csv(path + '/merged_final.csv')
         return
 
     def current_time(self):        

@@ -43,9 +43,9 @@ class bitstamp(apiBase):
 
         return df
 
-    def get_hist(self, *args, **kwargs):
+    def get_hist(self, start=1364778000, *args, **kwargs):
         return super(bitstamp, self).get_hist(            
-            start=1364778000,
+            start=start,
             name=self.name,
             *args, **kwargs
         )

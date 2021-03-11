@@ -51,9 +51,9 @@ class binance(apiBase):
 
         return df.astype(float)
 
-    def get_hist(self, *args, **kwargs):
+    def get_hist(self, start=1500000000, *args, **kwargs):
         return super(binance, self).get_hist(
-            start=1500000000,         
+            start=start,         
             # start=1484778000,
             name=self.name,
             *args, **kwargs

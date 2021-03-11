@@ -1,3 +1,4 @@
+import os
 import time
 import requests
 import numpy as np
@@ -109,7 +110,8 @@ class apiBase:
         
         return df
 
-    def update(self, path=None):
+    def update(self, path):
+        assert os.path.exists(path), "path doesn't exists!"
         df = pd.read_csv(path, index_col='timestamp')
 
         last_timestamp = df.index[-1]
