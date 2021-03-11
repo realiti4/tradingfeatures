@@ -34,7 +34,7 @@ class uber:
         self.columns = ['open', 'low', 'high', 'close', 'volume']
         self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
 
-    def eval_get(self, limit=1000, new_api=False):
+    def eval_get(self, limit=1000, **kwargs):
         datasets = []
 
         for api in self.apis:
@@ -42,11 +42,11 @@ class uber:
             df = df[-limit:]
             datasets.append([api.name, df])
 
-        merged = self.get(datasets=datasets, save=False, fundings=True, trends=False, new_api=new_api)
+        merged = self.get(datasets=datasets, save=False, fundings=True, trends=False, **kwargs)
         return merged
         
     def get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
-                new_api=False):
+                legacy_bitmex_api=False, experiment_binance=False):
         
         if datasets is None:    # if dataset update, else download everything
             datasets = []
@@ -93,7 +93,7 @@ class uber:
             final_columns = self.columns
             final_columns.append('fundingRate')
         
-            if new_api:
+            if not legacy_bitmex_api:
                 start_timestamp = df_final.index[0]
                 df_bitmex = self.bitmex_v2.get_fundings(start_timestamp)  
                 merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
@@ -104,6 +104,12 @@ class uber:
                 merged = self.bitmex.price_funding_merger(df_final, df_bitmex)
 
             df_final = merged[final_columns]
+
+        if experiment_binance:
+            binance_api = self.apis_dict['binance']
+            columns = ['quote_asset_volume', 'number_of_trades', 'taker_base_asset_volume', 'taker_quote_asset_volume']
+            features = binance_api.get().set_index('timestamp')[columns]
+            df_final = df_final.join(features)
 
         if trends:
             df_trends = self.google_trends.update('uber_data')

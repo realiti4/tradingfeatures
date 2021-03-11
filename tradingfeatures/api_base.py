@@ -57,7 +57,7 @@ class apiBase:
             end = None,
             name = None,
             columns = None,
-            interval = '1h',
+            interval = '1h',    # Don't use this for now, only 1h is supported
             global_columns=True,
             ):      
 

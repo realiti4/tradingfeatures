@@ -46,6 +46,7 @@ class binance(apiBase):
         df['timestamp'] = df['open_time'].div(1000).astype(int)
         df.pop('open_time')
         df.pop('close_time')
+        df.pop('ignore')
 
         return df
 
