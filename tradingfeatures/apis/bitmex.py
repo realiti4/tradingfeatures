@@ -49,7 +49,7 @@ class bitmex(apiBase):
         df = pd.read_json(r.content)
         df['timestamp'] = self.to_ts(df['timestamp'])
         df.pop('symbol')
-        df = df.astype(float)
+        # df = df.astype(float)
 
         # int timestamp, and float convertion here
 

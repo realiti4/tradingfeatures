@@ -16,11 +16,12 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
 * Bitfinex
 * Bitstamp
 * Binance
+* Bitmex
 
 ### Get most recent history with .get()
 
     import pandas as pd
-    from tradingfeatures import bitfinex, bitstamp, binance
+    from tradingfeatures import bitfinex, bitstamp, binance, bitmex
 
     bitfinex = bitfinex()
 
@@ -32,7 +33,7 @@ This is useful to get most recent history. But limit is 10000 for Bitfinex and 1
 The tool will download all avaliable history while respecting request per minute limits. Using it easy, and it takes couple of minutes for 1h data.
 
     import pandas as pd
-    from tradingfeatures import bitfinex, bitstamp, binance
+    from tradingfeatures import bitfinex, bitstamp, binance, bitmex
 
     bitstamp = bitstamp()
     
@@ -42,7 +43,7 @@ The tool will download all avaliable history while respecting request per minute
 ### Updating a csv file with .update()
 
     import pandas as pd
-    from tradingfeatures import bitfinex, bitstamp, binance
+    from tradingfeatures import bitfinex, bitstamp, binance, bitmex
 
     bitstamp = bitstamp()
     
