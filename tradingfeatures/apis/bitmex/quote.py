@@ -31,7 +31,7 @@ class bitmexQuote(bitmexBase):
             *args, **kwargs
         )
 
-    def get_hist(self, start=1463227200, convert_funds=False, *args, **kwargs):
+    def get_hist(self, convert_funds=False, *args, **kwargs):
         df = apiBase.get_hist(
             self,
             columns=['bidSize', 'bidPrice', 'askPrice', 'askSize'],

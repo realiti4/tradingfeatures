@@ -58,7 +58,7 @@ class apiBase:
             end = None,
             columns = None,
             interval = '1h',    # Don't use this for now, only 1h is supported
-            keep_global_columns=True,
+            global_columns=True,
             interpolate=True,   # Should be ok to enable I guess, check later
             df_update=None,
             ):      
@@ -103,7 +103,7 @@ class apiBase:
             # print(f'  {i} of {steps}')
             time.sleep(self.sleep)
 
-        if keep_global_columns:
+        if global_columns:
             df = df[columns]
         # df = df.drop_duplicates(subset='timestamp')
         df = df[~df.index.duplicated(keep='first')]

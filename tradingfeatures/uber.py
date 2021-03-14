@@ -11,7 +11,7 @@ from tradingfeatures import binance
 from tradingfeatures import google_trends
 
 
-class uber:
+class Uber:
 
     def __init__(self,
         api_to_use=['bitfinex', 'bitstamp']
@@ -50,7 +50,7 @@ class uber:
         return merged
         
     def get(self, path='', datasets=None, merge=True, fundings=True, trends=False, date=True, save=True, 
-                legacy_bitmex_api=False, experiment_binance=False, **kwargs):
+                legacy_bitmex_api=False, experiment_binance=False, force_columns=True, **kwargs):
         
         if datasets is None:    # if dataset update, else download everything
             datasets = []
@@ -62,7 +62,10 @@ class uber:
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
         
         for i in range(len(datasets)):
-            datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
+            if force_columns:
+                datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
+            else:
+                datasets[i][1] = datasets[i][1].loc[:self.current_time()-1]
 
         if save:
             for df in datasets:
@@ -84,7 +87,7 @@ class uber:
         df_final = pd.DataFrame(columns=self.columns)
         
         for item in self.columns:
-            if item == 'volume':
+            if item == 'volume' or item == 'trades':
                 df_final[item] = df_main.loc[:, df_main.columns.str.contains(item)].sum(axis=1)
             else:
                 df_final[item] = df_main.loc[:, df_main.columns.str.contains(item)].mean(axis=1)
@@ -102,10 +105,10 @@ class uber:
             df_bitmex = self.bitmex.funding.get_hist(start=start_timestamp, convert_funds=True)
             merged = df_final.join(df_bitmex)
             # merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
-            if save:
-                df_bitmex.to_csv(path + '/bitmex_fundings.csv')
+            # if save:
+            #     df_bitmex.to_csv(path + '/bitmex_fundings.csv')
 
-            df_final = merged[final_columns]
+            df_final = merged[final_columns] if force_columns else merged
 
         if experiment_binance:
             binance_api = self.apis_dict['binance']
@@ -125,7 +128,7 @@ class uber:
         
         return df_final
         
-    def update(self, path='uber_data', fundings=True):  # Fix path
+    def update(self, path='uber_data', fundings=True, **kwargs):  # Fix path
         working_directory = os.getcwd()
         datasets = []
 
@@ -140,7 +143,7 @@ class uber:
 
             datasets.append([api.name, df])
 
-        updated = self.get(path, datasets=datasets, fundings=fundings)
+        updated = self.get(path, datasets=datasets, fundings=fundings, **kwargs)
         updated.to_csv(path + '/merged_final.csv')
         return
 
