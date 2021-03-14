@@ -17,6 +17,12 @@ class bitmex(bitmexBase):
         self.funding = bitmexFunding()
         self.quote = bitmexQuote()
 
+    def update(self, path, update_all=False, *args, **kwargs):        
+        if update_all:
+            return self.update_all(*args, **kwargs)
+        else:
+            return super(bitmex, self).update(path, *args, **kwargs)
+
     def update_all(self, folder_path='uber_data'):
         """
             Update everything that api offers.
@@ -24,6 +30,7 @@ class bitmex(bitmexBase):
         assert '.csv' not in folder_path, 'Use a folder path'
         name_func = lambda x: f'{folder_path}/{x.name}.csv'
 
+        self.update(name_func(self))
         self.funding.update(name_func(self.funding))
         self.quote.update(name_func(self.quote))
 
