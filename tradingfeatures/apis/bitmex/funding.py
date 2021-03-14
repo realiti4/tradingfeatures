@@ -22,7 +22,7 @@ class bitmexFunding(bitmexBase):
         symbol = symbol or 'XBT'
         
         if query is None:
-            query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': start}
+            query = {'symbol': symbol, 'count': self.limit, 'reverse': 'false', 'startTime': start}
 
         return super(bitmexFunding, self).get(
             query=query,

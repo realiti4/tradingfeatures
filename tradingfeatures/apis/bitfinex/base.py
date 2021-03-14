@@ -53,6 +53,7 @@ class bitfinexBase(apiBase):
 
         df = pd.DataFrame(data, columns=self.columns)
         df['timestamp'] = df['timestamp'].div(1000).astype(int)     # Fixing timestamp inside self.get
+        df = df.set_index('timestamp')
         
         return df
 

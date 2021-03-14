@@ -50,6 +50,7 @@ class bitstampBase(apiBase):
         df = pd.DataFrame(result)   # fix index
         df = df.astype(float)
         df['timestamp'] = df['timestamp'].astype(int)
+        df = df.set_index('timestamp')
 
         return df
 

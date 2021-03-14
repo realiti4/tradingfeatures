@@ -13,7 +13,7 @@ class apiBase:
         self.per_step = per_step
         self.sleep = sleep
 
-        self.default_columns = ['high', 'timestamp', 'volume', 'low', 'close', 'open']
+        self.default_columns = ['high', 'volume', 'low', 'close', 'open']
         self.start = None
 
     def get(self, *args, **kwargs):
@@ -58,8 +58,9 @@ class apiBase:
             end = None,
             columns = None,
             interval = '1h',    # Don't use this for now, only 1h is supported
-            global_columns=True,
+            keep_global_columns=True,
             interpolate=True,   # Should be ok to enable I guess, check later
+            df_update=None,
             ):      
 
         # init        
@@ -96,13 +97,18 @@ class apiBase:
             # print(f'  {i} of {steps}')
             time.sleep(self.sleep)
 
-        if global_columns:
+        if keep_global_columns:
             df = df[columns]
-        df = df.drop_duplicates(subset='timestamp')
+        # df = df.drop_duplicates(subset='timestamp')
+        df = df[~df.index.duplicated(keep='first')]
         
-        df = df.set_index('timestamp')
-        df.index = df.index.astype(int)
-        df = df.astype(float)
+        # df = df.set_index('timestamp')
+        # df.index = df.index.astype(int)
+        df = df.astype(float)       # check this one
+
+        if df_update:   # check this later
+            df = pd.concat([df_update, df])
+            df = df[~df.index.duplicated(keep='first')]
 
         if interpolate:
             # interpolate nan data
@@ -115,18 +121,23 @@ class apiBase:
         return df
 
     def update(self, path):
-        assert os.path.exists(path), "path doesn't exists!"
+        # assert os.path.exists(path), "path doesn't exists!"
+        if not os.path.exists(path):    # Disabled
+            assert '.csv' in path, "Not a valid .csv location!"
+            print("Couldn't find a file to update, downloading all history now..")
+            df = self.get_hist()
+            df.to_csv(path)
+            return
+        
         df = pd.read_csv(path, index_col='timestamp')
 
         last_timestamp = df.index[-1]
-
         updates = self.get_hist(start=last_timestamp)
 
         df_final = pd.concat([df, updates])
-
         df_final = df_final[~df_final.index.duplicated(keep='first')]
-
         df_final.to_csv(path)
+
         return df_final
 
     def to_ts(self, df):   # Convert datetime to timestamp        

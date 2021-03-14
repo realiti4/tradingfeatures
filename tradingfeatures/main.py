@@ -19,9 +19,7 @@ class uber:
 
         self.apis_dict = {
             'bitfinex': bitfinex(),
-            # 'bitfinex_wrong': bitfinex(wrong_columns=True),
             'bitstamp': bitstamp(),
-            # 'bitmex_legacy': bitmexLegacy(),
             'bitmex': bitmex(),
             'binance': binance(),
         }
@@ -69,7 +67,7 @@ class uber:
         if save:
             for df in datasets:
                 name, df = df[0], df[1]
-                df.to_csv(path + f'/{name}_1h.csv')
+                df.to_csv(path + f'/{name}.csv')
         if not merge:
             return
 
@@ -132,7 +130,7 @@ class uber:
         datasets = []
 
         for api in self.apis:
-            path_df = path + f'/{api.name}_1h.csv'
+            path_df = path + f'/{api.name}.csv'
             if os.path.exists(path_df):
                 df = api.update(path_df)
             else:

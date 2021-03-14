@@ -9,37 +9,22 @@ from tradingfeatures.apis.bitmex.funding import bitmexFunding
 from tradingfeatures.apis.bitmex.quote import bitmexQuote
 
 
-# class bitmex():
-
-#     def __init__(self):
-        
-#         self.base = bitmexBase()
-#         self.funding = bitmexFunding()
-#         self.quote = bitmexQuote()
-
-#         self.name = self.base.name
-
-#     def get(self, *args, **kwargs):
-#         return self.base.get(*args, **kwargs)
-
-#     def get_hist(self, *args, **kwargs):
-#         return self.base.get_hist(*args, **kwargs)
-
-#     def update_all(self):
-#         """
-#             Update everything that api offers.
-#         """
-#         raise NotImplementedError
-
 class bitmex(bitmexBase):
 
     def __init__(self):
         super(bitmex, self).__init__()
         
         self.funding = bitmexFunding()
+        self.quote = bitmexQuote()
 
-    def update_all(self):
+    def update_all(self, folder_path='uber_data'):
         """
             Update everything that api offers.
         """
-        raise NotImplementedError    
+        assert '.csv' not in folder_path, 'Use a folder path'
+        name_func = lambda x: f'{folder_path}/{x.name}.csv'
+
+        self.funding.update(name_func(self.funding))
+        self.quote.update(name_func(self.quote))
+
+        print('Successful..')

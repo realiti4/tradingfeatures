@@ -56,6 +56,8 @@ class binanceBase(apiBase):
         df.pop('close_time')
         df.pop('ignore')
 
+        df = df.set_index('timestamp')
+        df.index = df.index.astype(int)
         return df.astype(float)
 
     def get_hist(self, *args, **kwargs):

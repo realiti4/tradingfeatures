@@ -17,7 +17,7 @@ class bitmexBase(apiBase):
 
         self.base_address = 'https://www.bitmex.com/api/v1'
         self.address = '/trade/bucketed'
-        self.start = 1463227200
+        self.start = 1423227200
         self.limit = 500
     
     def get(self,
@@ -58,9 +58,9 @@ class bitmexBase(apiBase):
         df = pd.read_json(r.content)
         df['timestamp'] = self.to_ts(df['timestamp'])
         df.pop('symbol')
+        df = df.set_index('timestamp')
+        df.index = df.index.astype(int)
         # df = df.astype(float)
-
-        # int timestamp, and float convertion here
 
         return df
 
