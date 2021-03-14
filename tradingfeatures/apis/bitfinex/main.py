@@ -7,17 +7,28 @@ from tradingfeatures import apiBase
 from tradingfeatures.apis.bitfinex.base import bitfinexBase
 
 
-class bitfinex():
+# class bitfinex():
+
+#     def __init__(self):
+        
+#         self.base = bitfinexBase()
+
+#     def get(self, *args, **kwargs):
+#         return self.base.get(*args, **kwargs)
+
+#     def get_hist(self, *args, **kwargs):
+#         return self.base.get_hist(*args, **kwargs)
+
+#     def update_all(self):
+#         """
+#             Update everything that api offers.
+#         """
+#         raise NotImplementedError
+
+class bitfinex(bitfinexBase):
 
     def __init__(self):
-        
-        self.base = bitfinexBase()
-
-    def get(self, *args, **kwargs):
-        return self.base.get(*args, **kwargs)
-
-    def get_hist(self, *args, **kwargs):
-        return self.base.get_hist(*args, **kwargs)
+        super(bitfinex, self).__init__()
 
     def update_all(self):
         """
