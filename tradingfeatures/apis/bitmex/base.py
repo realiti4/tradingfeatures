@@ -33,7 +33,7 @@ class bitmexBase(apiBase):
         
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'XBT'        
+        symbol = symbol or 'XBT'
         
         if query is None:
             limit = self.limit if limit is None else limit

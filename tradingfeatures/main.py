@@ -96,7 +96,7 @@ class uber:
             
         # Extras
         if fundings:
-            final_columns = self.columns
+            final_columns = self.columns.copy()
             final_columns.append('fundingRate')
         
             # read old bitmex data here when update

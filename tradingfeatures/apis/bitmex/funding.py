@@ -19,6 +19,7 @@ class bitmexFunding(bitmexBase):
         start = self.start if start is None else start
         end = time.time() if end is None else end
         start, end = self.to_date(start), self.to_date(end)
+        symbol = symbol or 'XBT'
         
         if query is None:
             query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': start}
