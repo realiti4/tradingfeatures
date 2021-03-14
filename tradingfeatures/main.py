@@ -6,7 +6,7 @@ import pandas as pd
 
 from tradingfeatures import bitfinex
 from tradingfeatures import bitstamp
-from tradingfeatures import bitmexLegacy, bitmex
+from tradingfeatures import bitmex
 from tradingfeatures import binance
 from tradingfeatures import google_trends
 
@@ -19,16 +19,16 @@ class uber:
 
         self.apis_dict = {
             'bitfinex': bitfinex(),
-            'bitfinex_wrong': bitfinex(wrong_columns=True),
+            # 'bitfinex_wrong': bitfinex(wrong_columns=True),
             'bitstamp': bitstamp(),
-            'bitmex_legacy': bitmexLegacy(),
+            # 'bitmex_legacy': bitmexLegacy(),
             'bitmex': bitmex(),
             'binance': binance(),
         }
 
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
 
-        self.bitmex_legacy = bitmexLegacy()
+        # self.bitmex_legacy = bitmexLegacy()
         self.bitmex = bitmex()
         self.google_trends = google_trends()
 
@@ -96,20 +96,16 @@ class uber:
             
         # Extras
         if fundings:
-            final_columns = self.columns
+            final_columns = self.columns.copy()
             final_columns.append('fundingRate')
         
-            if not legacy_bitmex_api:
-                # read old bitmex data here when update
-                start_timestamp = df_final.index[0]
-                df_bitmex = self.bitmex.get_fundings(start_timestamp, convert_funds=True)
-                merged = df_final.join(df_bitmex)
-                # merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
-                if save:
-                    df_bitmex.to_csv(path + '/bitmex_fundings.csv')
-            else:                                
-                df_bitmex = self.bitmex_legacy.get_funding_rates(save_csv=False)            
-                merged = self.bitmex_legacy.price_funding_merger(df_final, df_bitmex)
+            # read old bitmex data here when update
+            start_timestamp = df_final.index[0]
+            df_bitmex = self.bitmex.funding.get_hist(start=start_timestamp, convert_funds=True)
+            merged = df_final.join(df_bitmex)
+            # merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
+            if save:
+                df_bitmex.to_csv(path + '/bitmex_fundings.csv')
 
             df_final = merged[final_columns]
 
