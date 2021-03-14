@@ -75,6 +75,8 @@ class apiBase:
         steps = (total_entries // self.per_step) + 1
 
         df = pd.DataFrame(columns=columns)
+        df.index.name = 'timestamp'
+        # df = None
 
         print(f'  Downloading {name}')
         
@@ -89,6 +91,10 @@ class apiBase:
                 print(e)
                 print('error between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
+
+            # if df is None:
+            #     df = df_temp
+            # else:
 
             df_temp = pd.concat([df, df_temp])
             df = df_temp
