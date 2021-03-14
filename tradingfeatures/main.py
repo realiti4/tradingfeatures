@@ -51,7 +51,7 @@ class uber:
 
         return merged
         
-    def get(self, path='', datasets=None, merge=True, fundings=False, trends=False, date=True, save=True, 
+    def get(self, path='', datasets=None, merge=True, fundings=True, trends=False, date=True, save=True, 
                 legacy_bitmex_api=False, experiment_binance=False, **kwargs):
         
         if datasets is None:    # if dataset update, else download everything
@@ -137,7 +137,12 @@ class uber:
 
         for api in self.apis:
             path_df = path + f'/{api.name}_1h.csv'
-            df = api.update(path_df)
+            if os.path.exists(path_df):
+                df = api.update(path_df)
+            else:
+                print(f"Couldn't find {api.name} data, downloading from strach..")
+                df = api.get_hist()
+                df.to_csv(path_df)
 
             datasets.append([api.name, df])
 
