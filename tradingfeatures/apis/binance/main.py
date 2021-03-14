@@ -4,20 +4,14 @@ import numpy as np
 import pandas as pd
 
 from tradingfeatures import apiBase
-from tradingfeatures.apis.bitmex_v3.base import bitmexBase
-from tradingfeatures.apis.bitmex_v3.funding import bitmexFunding
-from tradingfeatures.apis.bitmex_v3.quote import bitmexQuote
+from tradingfeatures.apis.binance.base import binanceBase
 
 
-class bitmexV3():
+class binance():
 
     def __init__(self):
         
-        self.base = bitmexBase()
-        self.funding = bitmexFunding()
-        self.quote = bitmexQuote()
-
-        print('debug')
+        self.base = binanceBase()
 
     def get(self, *args, **kwargs):
         return self.base.get(*args, **kwargs)

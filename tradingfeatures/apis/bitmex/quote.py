@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from tradingfeatures import apiBase
-from tradingfeatures.apis.bitmex_v3.base import bitmexBase
+from tradingfeatures.apis.bitmex.base import bitmexBase
 
 
 class bitmexQuote(bitmexBase):

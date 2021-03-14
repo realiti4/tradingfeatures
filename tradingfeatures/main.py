@@ -6,7 +6,7 @@ import pandas as pd
 
 from tradingfeatures import bitfinex
 from tradingfeatures import bitstamp
-from tradingfeatures import bitmexLegacy, bitmex
+from tradingfeatures import bitmex
 from tradingfeatures import binance
 from tradingfeatures import google_trends
 
@@ -21,7 +21,7 @@ class uber:
             'bitfinex': bitfinex(),
             'bitfinex_wrong': bitfinex(wrong_columns=True),
             'bitstamp': bitstamp(),
-            'bitmex_legacy': bitmexLegacy(),
+            # 'bitmex_legacy': bitmexLegacy(),
             'bitmex': bitmex(),
             'binance': binance(),
         }

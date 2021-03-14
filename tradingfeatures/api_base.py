@@ -134,3 +134,12 @@ class apiBase:
 
     def to_date(self, x):       # Convert timestamp to datetime
         return pd.to_datetime(x, unit='s', utc=True)
+
+    def ts_to_mts(self, time):
+        # second timestamp to millisecond timestamp
+        if time:
+            if len(str(time)) == 10:
+                return int(time)*1000
+            else:
+                assert len(str(time)) == 13, 'Please use a timestamp value with lenght 10!'
+                return int(time)
