@@ -3,13 +3,13 @@ import requests
 import numpy as np
 import pandas as pd
 
-from tradingfeatures import apiBase
+from tradingfeatures_legacy import apiBase
 
 
-class bitmex(apiBase):
+class bitmexLegacy(apiBase):
 
     def __init__(self):
-        super(bitmex, self).__init__(
+        super(bitmexLegacy, self).__init__(
             name = 'bitmex',
             per_step = 500,
             sleep = 0,
@@ -56,29 +56,18 @@ class bitmex(apiBase):
         return df
 
     def get_hist(self, start=1423186000, *args, **kwargs):
-        return super(bitmex, self).get_hist(
+        return super(bitmexLegacy, self).get_hist(
             address='/trade/bucketed',
             start=start,
             name=self.name,
             *args, **kwargs
         )
 
-    def get_quote(self, start=1423186000, *args, **kwargs):
-        return super(bitmex, self).get_hist(
-            address='/quote/bucketed',
-            start=start,
-            name=self.name,
-            *args, **kwargs
-        )
-
-        address = '/quote/bucketed'
-        self.get(address='instrument', query={'symbol': 'XBT'})
-
     def get_settlement(self):
         return
 
     def get_fundings(self, start=1463227200, convert_funds=False, *args, **kwargs):
-        df_fundings = super(bitmex, self).get_hist(
+        df_fundings = super(bitmexLegacy, self).get_hist(
             name='bitmex_funding',
             address='funding',
             start=start,
@@ -110,14 +99,3 @@ class bitmex(apiBase):
 
         return df_final
 
-    # def price_funding_merger(self, df, df_fundings):
-    #     aranged_array = np.arange(df_fundings.index[0], df_fundings.index[-1] + 1, 3600)
-    #     df_empty = pd.DataFrame(index=aranged_array)
-
-    #     df_fundings = df_empty.join(df_fundings)
-    #     df_fundings = df_empty.join(df_fundings).fillna(method='bfill')   # can remove limit
-    #     # df_fundings['fundingRate'].replace(0, 0.0001, inplace=True)     # Check this
-        
-    #     merged = df.join(df_fundings)
-
-    #     return merged, df_fundings   

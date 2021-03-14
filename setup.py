@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
-    name="tradingfeatures",
+    name="tradingfeatures_legacy",
     version="0.4.5",
     author="Onur Cetinkol",
     author_email="realiti44@gmail.com",

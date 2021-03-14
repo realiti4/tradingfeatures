@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-class bitmexLegacy:
+class bitmexLegacy_wrongfunding:
 
     def get_(self, address, query):
         r = requests.get(address, params=query, timeout=60)

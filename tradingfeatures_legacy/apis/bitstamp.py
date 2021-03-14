@@ -4,12 +4,12 @@ import pandas as pd
 
 from datetime import datetime
 
-from tradingfeatures import apiBase
+from tradingfeatures_legacy import apiBase
 
-class bitstamp(apiBase):
+class bitstampLegacy(apiBase):
 
     def __init__(self):
-        super(bitstamp, self).__init__(
+        super(bitstampLegacy, self).__init__(
             name = 'bitstamp',
             per_step = 1000,
             sleep = 0,
@@ -44,7 +44,7 @@ class bitstamp(apiBase):
         return df
 
     def get_hist(self, start=1364778000, *args, **kwargs):
-        return super(bitstamp, self).get_hist(            
+        return super(bitstampLegacy, self).get_hist(            
             start=start,
             name=self.name,
             *args, **kwargs

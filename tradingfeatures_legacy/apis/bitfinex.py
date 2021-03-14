@@ -4,12 +4,12 @@ import pandas as pd
 
 from datetime import datetime
 
-from tradingfeatures import apiBase
+from tradingfeatures_legacy import apiBase
 
-class bitfinex(apiBase):
+class bitfinexLegacy(apiBase):
     
     def __init__(self, wrong_columns=False):
-        super(bitfinex, self).__init__(
+        super(bitfinexLegacy, self).__init__(
             name = 'bitfinex',
             per_step = 120,
             sleep = 0.5,
@@ -52,7 +52,7 @@ class bitfinex(apiBase):
         return df
 
     def get_hist(self, start=1364778000, *args, **kwargs):
-        return super(bitfinex, self).get_hist(            
+        return super(bitfinexLegacy, self).get_hist(            
             start=start,
             name=self.name,
             *args, **kwargs

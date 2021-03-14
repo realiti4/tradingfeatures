@@ -4,12 +4,12 @@ import pandas as pd
 
 from datetime import datetime
 
-from tradingfeatures import apiBase
+from tradingfeatures_legacy import apiBase
 
-class binance(apiBase):
+class binanceLegacy(apiBase):
 
     def __init__(self):
-        super(binance, self).__init__(
+        super(binanceLegacy, self).__init__(
             name = 'binance',
             per_step = 1000,
             sleep = 0.7,
@@ -52,7 +52,7 @@ class binance(apiBase):
         return df.astype(float)
 
     def get_hist(self, start=1500000000, *args, **kwargs):
-        return super(binance, self).get_hist(
+        return super(binanceLegacy, self).get_hist(
             start=start,         
             # start=1484778000,
             name=self.name,

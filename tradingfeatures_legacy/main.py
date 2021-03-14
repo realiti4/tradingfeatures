@@ -4,32 +4,32 @@ import requests
 import numpy as np
 import pandas as pd
 
-from tradingfeatures import bitfinex
-from tradingfeatures import bitstamp
-from tradingfeatures import bitmexLegacy, bitmex
-from tradingfeatures import binance
-from tradingfeatures import google_trends
+from tradingfeatures_legacy import bitfinexLegacy
+from tradingfeatures_legacy import bitstampLegacy
+from tradingfeatures_legacy import bitmexLegacy_wrongfunding, bitmexLegacy
+from tradingfeatures_legacy import binanceLegacy
+from tradingfeatures_legacy import google_trends
 
 
-class uber:
+class uberLegacy:
 
     def __init__(self,
         api_to_use=['bitfinex', 'bitstamp']
         ):
 
         self.apis_dict = {
-            'bitfinex': bitfinex(),
-            'bitfinex_wrong': bitfinex(wrong_columns=True),
-            'bitstamp': bitstamp(),
-            'bitmex_legacy': bitmexLegacy(),
-            'bitmex': bitmex(),
-            'binance': binance(),
+            'bitfinex': bitfinexLegacy(),
+            'bitfinex_wrong': bitfinexLegacy(wrong_columns=True),
+            'bitstamp': bitstampLegacy(),
+            'bitmex_legacy': bitmexLegacy_wrongfunding(),
+            'bitmex': bitmexLegacy(),
+            'binance': binanceLegacy(),
         }
 
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
 
-        self.bitmex_legacy = bitmexLegacy()
-        self.bitmex = bitmex()
+        self.bitmex_legacy = bitmexLegacy_wrongfunding()
+        self.bitmex = bitmexLegacy()
         self.google_trends = google_trends()
 
         self.columns = ['open', 'low', 'high', 'close', 'volume']
