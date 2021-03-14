@@ -4,35 +4,43 @@ import numpy as np
 import pandas as pd
 
 from tradingfeatures import apiBase
-from tradingfeatures.apis.bitmex_v3.price import bitmexPrice
+from tradingfeatures.apis.bitmex_v3.base import bitmexBase
 
 
-class bitmexFundings(bitmexPrice):
+class bitmexFunding(bitmexBase):
 
     def __init__(self):
-        super(bitmexFundings, self).__init__()
+        super(bitmexFunding, self).__init__()
         self.name = 'bitmex_fundings'
+        self.address = '/funding'
+        self.start = 1463227200
 
-    def get(self, address='funding', *args, **kwargs):
-        return super(bitmexFundings, self).get(
-            address=address,
+    def get(self, symbol=None, query=None, start=None, end=None, *args, **kwargs):
+        start = self.start if start is None else start
+        end = time.time() if end is None else end
+        start, end = self.to_date(start), self.to_date(end)
+        
+        if query is None:
+            query = {'symbol': symbol, 'count': 500, 'reverse': 'false', 'startTime': start}
+
+        return super(bitmexFunding, self).get(
+            query=query,
+            start=start,
+            end=end,
             *args, **kwargs
         )
 
-    def get_hist(self, start=1463227200, convert_funds=False, *args, **kwargs):
+    def get_hist(self, convert_funds=False, *args, **kwargs):  
         df_fundings = apiBase.get_hist(
             self,
-            name='bitmex_funding',
-            address='funding',
-            start=start,
             columns=['timestamp', 'fundingRate', 'fundingRateDaily'],
             interval='8h',
             *args, **kwargs
         )
 
         # Recent funding
-        address = 'instrument'
-        r_current = self.get(address, query={'symbol': 'XBT'}, return_r=True)
+        address = '/instrument'
+        r_current = self.get(address=address, query={'symbol': 'XBT'}, return_r=True)
         current_data = r_current.json()[0]
 
         funding_ts = current_data['fundingTimestamp']

@@ -6,7 +6,7 @@ import pandas as pd
 
 from datetime import datetime
 
-class apiBase:
+class apiBaseLegacy:
 
     def __init__(self, name, per_step, sleep):
         self.name = name
@@ -14,7 +14,6 @@ class apiBase:
         self.sleep = sleep
 
         self.default_columns = ['high', 'timestamp', 'volume', 'low', 'close', 'open']
-        self.start = None
 
     def get(self, *args, **kwargs):
         raise NotImplementedError
@@ -54,8 +53,11 @@ class apiBase:
         r.raise_for_status()
 
     def get_hist(self,
+            get = None,      # Takes a get function
+            address = None,               
             start = None, 
             end = None,
+            name = None,
             columns = None,
             interval = '1h',    # Don't use this for now, only 1h is supported
             global_columns=True,
@@ -63,9 +65,10 @@ class apiBase:
             ):      
 
         # init        
-        name = f'{self.name}_{interval}'
+        get = get or self.get
+        name = f'{name}_{interval}'
         columns = columns or self.default_columns
-        start = start or self.start
+        start = start or 1364778000
         end = end or int(time.time())
 
         interval, minutes = self.interval_check(interval)
@@ -83,7 +86,7 @@ class apiBase:
             if end_batch >= end:
                 end_batch = end
             try:
-                df_temp = self.get(start=str(start_batch), end=str(end_batch))
+                df_temp = get(address=address, start=str(start_batch), end=str(end_batch))
             except Exception as e:
                 print(e)
                 print('error between timestamps: ', start_batch, end_batch)
