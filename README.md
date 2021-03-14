@@ -2,13 +2,9 @@
 A useful tool to download market history from popular exchanges.
 
 
-## Installation
+### Legacy version
 
-    pip install tradingfeatures
-
-or	
-
-    pip install git+https://github.com/realiti4/tradingfeatures.git@master --upgrade
+    pip install git+https://github.com/realiti4/tradingfeatures.git@legacy --upgrade
 
 ## Example
 You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. Currently supported:
