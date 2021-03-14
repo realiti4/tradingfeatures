@@ -37,7 +37,7 @@ class Uber:
         datasets = []
 
         for api in self.apis:
-            df = api.get().set_index('timestamp')
+            df = api.get()
             df = df[-limit:]
             datasets.append([api.name, df])
 
