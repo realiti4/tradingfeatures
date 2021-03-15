@@ -19,9 +19,11 @@ class Uber:
 
         self.apis_dict = {
             'bitfinex': bitfinex(),
-            'bitstamp': bitstamp(),
-            'bitmex': bitmex(),
+            'bitstamp': bitstamp(),            
             'binance': binance(),
+            'bitmex': bitmex(),
+            'bitmex_funding': bitmex().funding,
+            'bitmex_quote': bitmex().quote,
         }
 
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
@@ -37,15 +39,16 @@ class Uber:
         datasets = []
 
         for api in self.apis:
-            df = api.get()
+            df = api.get(limit=limit)
             df = df[-limit:]
             datasets.append([api.name, df])
 
-        merged = self.get(datasets=datasets, save=False, fundings=True, trends=False, **kwargs)
+        merged = self.get(datasets=datasets, save=False, trends=False, **kwargs)
 
         # Fix for 0 and nan - check here again later
         merged = merged.replace(0, np.nan)
-        merged = merged.interpolate()
+        if df.isnull().values.any():    # Check here later
+            merged = merged.interpolate()
 
         return merged
         
@@ -61,6 +64,7 @@ class Uber:
         
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
         
+        # Remove active hour
         for i in range(len(datasets)):
             if force_columns:
                 datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
@@ -113,7 +117,7 @@ class Uber:
         if experiment_binance:
             binance_api = self.apis_dict['binance']
             columns = ['quote_asset_volume', 'number_of_trades', 'taker_base_asset_volume', 'taker_quote_asset_volume']
-            features = binance_api.get().set_index('timestamp')[columns]
+            features = binance_api.get()[columns]
             df_final = df_final.join(features)
 
         if trends:

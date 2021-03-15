@@ -29,7 +29,11 @@ class bitmexBase(apiBase):
             end: int = None,
             interval: str = '1h',
             return_r: bool = False,
-            ):      
+            ):
+
+        start, end, out_of_range = self.calc_start(limit, start, end, interval)
+        if out_of_range:
+            return self.get_hist(start=start, end=end)
         
         address = address or self.address
         address = self.base_address + address
@@ -37,14 +41,12 @@ class bitmexBase(apiBase):
         
         if query is None:
             limit = self.limit if limit is None else limit
-            start = self.start if start is None else start
-            end = time.time() if end is None else end
+            # start = self.start if start is None else start
+            # end = int(time.time()) if end is None else end
             start, end = self.to_date(start), self.to_date(end)
 
-            query = {'symbol': symbol, 'binSize': interval, 'count': limit, 'reverse': 'false', 'startTime': start}
-
-            # if '/trade' in address:
-            #     query['binSize'] = interval
+            query = {'symbol': symbol, 'binSize': interval, 'count': limit, 'startTime': start, 'endTime': end,
+                    'reverse': 'false'}
 
         r = self.response_handler(address, query)
         # Bitmex remaining limit
@@ -62,6 +64,7 @@ class bitmexBase(apiBase):
         df.index = df.index.astype(int)
         # df = df.astype(float)
 
+        df.index = df.index - 3600  # Compability with other apis, bitmex timestamp indexing is different
         return df
 
     def get_hist(self, *args, **kwargs):

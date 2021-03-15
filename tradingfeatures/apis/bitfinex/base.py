@@ -33,6 +33,10 @@ class bitfinexBase(apiBase):
             sort = -1,
             ):      
         
+        start, end, out_of_range = self.calc_start(limit, start, end)
+        if out_of_range:
+            return self.get_hist(start=start, end=end)
+        
         address = address or self.address
         address = self.base_address + address
         symbol = symbol or 'tBTCUSD'        
@@ -42,9 +46,7 @@ class bitfinexBase(apiBase):
             start, end = self.ts_to_mts(start), self.ts_to_mts(end)     # Conver for Bitfinex
             address = address + f'/trade:{interval}:{symbol}/hist'   
 
-            query = {'limit': limit, 'end': end, 'sort': sort}
-            if start is not None:
-                query['start'] = start
+            query = {'limit': limit, 'start': start, 'end': end, 'sort': sort}
 
         r = self.response_handler(address, params=query, timeout=60)
         

@@ -29,7 +29,11 @@ class bitstampBase(apiBase):
             end: int = None,
             interval: str = '1h',
             return_r: bool = False,
-            ):      
+            ):
+
+        start, end, out_of_range = self.calc_start(limit, start, end)
+        if out_of_range:
+            return self.get_hist(start=start, end=end) 
         
         address = address or self.address
         address = self.base_address + address
@@ -39,9 +43,7 @@ class bitstampBase(apiBase):
             limit = self.limit if limit is None else limit     
             address = address + f'/{symbol}/'   
 
-            query = {'end': end, 'step': 3600, 'limit': limit}
-            if start is not None:
-                query['start'] = start
+            query = {'start': start,'end': end, 'step': 3600, 'limit': limit}
 
         r = self.response_handler(address, params=query, timeout=60)
         

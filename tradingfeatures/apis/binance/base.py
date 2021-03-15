@@ -29,7 +29,11 @@ class binanceBase(apiBase):
             end: int = None,
             interval: str = '1h',
             return_r: bool = False,
-            ):      
+            ):
+
+        start, end, out_of_range = self.calc_start(limit, start, end)
+        if out_of_range:
+            return self.get_hist(start=start, end=end)
         
         address = address or self.address
         address = self.base_address + address
@@ -39,9 +43,7 @@ class binanceBase(apiBase):
             limit = self.limit if limit is None else limit
             start, end = self.ts_to_mts(start), self.ts_to_mts(end)
 
-            query = {'symbol': symbol, 'interval': interval, 'endTime': end, 'limit': limit}
-            if start is not None:
-                query['startTime'] = start
+            query = {'symbol': symbol, 'interval': interval, 'startTime': start, 'endTime': end, 'limit': limit}
 
         r = requests.get(address, params=query)
 
