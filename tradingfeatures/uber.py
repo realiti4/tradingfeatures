@@ -14,43 +14,48 @@ from tradingfeatures import google_trends
 class Uber:
 
     def __init__(self,
-        api_to_use=['bitfinex', 'bitstamp']
+        api_to_use: list = ['bitfinex', 'bitstamp'],
+        columns: bool = None,
+        column_kwargs: dict = None,
         ):
 
         self.apis_dict = {
             'bitfinex': bitfinex(),
-            'bitstamp': bitstamp(),
-            'bitmex': bitmex(),
+            'bitstamp': bitstamp(),            
             'binance': binance(),
+            'bitmex': bitmex(),
+            'bitmex_funding': bitmex().funding,
+            'bitmex_quote': bitmex().quote,
         }
 
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
 
-        # self.bitmex_legacy = bitmexLegacy()
         self.bitmex = bitmex()
         self.google_trends = google_trends()
 
-        self.columns = ['open', 'low', 'high', 'close', 'volume']
-        self.columns_final = ['close', 'low', 'high', 'volume', 'fundingRate']
+        self.columns = ['open', 'low', 'high', 'close', 'volume'] if columns is None else columns
+        self.column_kwargs = {} if column_kwargs is None else column_kwargs
 
     def eval_get(self, limit=1000, **kwargs):
         datasets = []
 
         for api in self.apis:
-            df = api.get()
+            api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
+            df = api.get(limit=limit, columns=api_columns)
             df = df[-limit:]
             datasets.append([api.name, df])
 
-        merged = self.get(datasets=datasets, save=False, fundings=True, trends=False, **kwargs)
+        merged = self.get(datasets=datasets, save=False, trends=False, date=False, **kwargs)
 
         # Fix for 0 and nan - check here again later
         merged = merged.replace(0, np.nan)
-        merged = merged.interpolate()
+        if merged.isnull().values.any():    # Check here later
+            merged = merged.interpolate()
 
         return merged
         
-    def get(self, path='', datasets=None, merge=True, fundings=True, trends=False, date=True, save=True, 
-                legacy_bitmex_api=False, experiment_binance=False, force_columns=True, **kwargs):
+    def get(self, path='', datasets=None, merge=True, trends=False, date=True, 
+            save=True, **kwargs):
         
         if datasets is None:    # if dataset update, else download everything
             datasets = []
@@ -61,20 +66,18 @@ class Uber:
         
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
         
-        for i in range(len(datasets)):
-            if force_columns:
-                datasets[i][1] = datasets[i][1][self.columns].loc[:self.current_time()-1]
-            else:
-                datasets[i][1] = datasets[i][1].loc[:self.current_time()-1]
+        # Remove active hour
+        for i in range(len(datasets)):           
+            datasets[i][1] = datasets[i][1].loc[:self.current_time()-1]
 
-        if save:
+        if save:    # Maybe save above after just getting history
             for df in datasets:
                 name, df = df[0], df[1]
                 df.to_csv(path + f'/{name}.csv')
         if not merge:
             return
 
-        # # And find a find to join more than 2 datasets each at a time. maybe an outer function might help
+        # # Join one dataset at a time
         name_main, df_main = datasets[0]
         for i in range(1, len(datasets)):
             name = datasets[i][0]
@@ -93,28 +96,7 @@ class Uber:
                 df_final[item] = df_main.loc[:, df_main.columns.str.contains(item)].mean(axis=1)
                 
         if date:
-            df_final['date'] = pd.to_datetime(df_final.index, unit='s', utc=True)
-            
-        # Extras
-        if fundings:
-            final_columns = self.columns.copy()
-            final_columns.append('fundingRate')
-        
-            # read old bitmex data here when update
-            start_timestamp = df_final.index[0]
-            df_bitmex = self.bitmex.funding.get_hist(start=start_timestamp, convert_funds=True)
-            merged = df_final.join(df_bitmex)
-            # merged, df_bitmex = self.bitmex_v2.price_funding_merger(df_final, df_bitmex)
-            # if save:
-            #     df_bitmex.to_csv(path + '/bitmex_fundings.csv')
-
-            df_final = merged[final_columns] if force_columns else merged
-
-        if experiment_binance:
-            binance_api = self.apis_dict['binance']
-            columns = ['quote_asset_volume', 'number_of_trades', 'taker_base_asset_volume', 'taker_quote_asset_volume']
-            features = binance_api.get().set_index('timestamp')[columns]
-            df_final = df_final.join(features)
+            df_final['date'] = pd.to_datetime(df_final.index, unit='s', utc=True)            
 
         if trends:
             df_trends = self.google_trends.update('uber_data')

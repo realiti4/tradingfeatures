@@ -16,13 +16,6 @@ class bitmexQuote(bitmexBase):
         self.start = 1423227200        
 
     def get(self, symbol=None, query=None, start=None, end=None, *args, **kwargs):
-        # start = self.start if start is None else start
-        # end = time.time() if end is None else end
-        # start, end = self.to_date(start), self.to_date(end)
-        # symbol = symbol or 'XBT'
-        
-        # if query is None:
-        #     query = {'symbol': symbol, 'binSize': interval, 'count': self.limit, 'reverse': 'false', 'startTime': start}
 
         return super(bitmexQuote, self).get(
             query=query,
@@ -31,10 +24,12 @@ class bitmexQuote(bitmexBase):
             *args, **kwargs
         )
 
-    def get_hist(self, convert_funds=False, *args, **kwargs):
+    def get_hist(self, columns=None, convert_funds=False, *args, **kwargs):
+        columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize'] if columns is None else columns
+
         df = apiBase.get_hist(
             self,
-            columns=['bidSize', 'bidPrice', 'askPrice', 'askSize'],
+            columns=columns,
             # interval='8h',
             *args, **kwargs
         )

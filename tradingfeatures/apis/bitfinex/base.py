@@ -29,9 +29,14 @@ class bitfinexBase(apiBase):
             start: int = None,
             end: int = None,
             interval: str = '1h',
+            columns: list = None,
             return_r: bool = False,
             sort = -1,
             ):      
+        
+        start, end, out_of_range = self.calc_start(limit, start, end)
+        if out_of_range:
+            return self.get_hist(start=start, end=end)
         
         address = address or self.address
         address = self.base_address + address
@@ -42,9 +47,7 @@ class bitfinexBase(apiBase):
             start, end = self.ts_to_mts(start), self.ts_to_mts(end)     # Conver for Bitfinex
             address = address + f'/trade:{interval}:{symbol}/hist'   
 
-            query = {'limit': limit, 'end': end, 'sort': sort}
-            if start is not None:
-                query['start'] = start
+            query = {'limit': limit, 'start': start, 'end': end, 'sort': sort}
 
         r = self.response_handler(address, params=query, timeout=60)
         
@@ -55,6 +58,8 @@ class bitfinexBase(apiBase):
         df['timestamp'] = df['timestamp'].div(1000).astype(int)     # Fixing timestamp inside self.get
         df = df.set_index('timestamp')
         
+        if columns is not None:
+            return df[columns]
         return df
 
     def get_hist(self, *args, **kwargs):

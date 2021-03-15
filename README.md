@@ -18,16 +18,16 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
 * Binance
 * Bitmex
 
-### Get most recent history with .get()
+### Get history with .get()
 
     import pandas as pd
     from tradingfeatures import bitfinex, bitstamp, binance, bitmex
 
     bitfinex = bitfinex()
 
-    df = bitfinex.get()
+    df = bitfinex.get(2000)
 
-This is useful to get most recent history. But limit is 10000 for Bitfinex and 1000 for others.
+Just pass how much data you want. It will return the amount in most recent 1h data. Currently only 1h data is supported. If history amount is above api limit, `.get()` will run `.get_history()` under the hood, so you don't need to worry about it. But if you want everything and don't want to guess how much data avaliable on each exchange, just run `.get_history()` and get everything.
 
 ### Download all available history with .get_history()
 The tool will download all avaliable history while respecting request per minute limits. Using it easy, and it takes couple of minutes for 1h data.

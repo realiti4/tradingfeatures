@@ -15,6 +15,7 @@ class apiBase:
 
         self.default_columns = ['high', 'volume', 'low', 'close', 'open']
         self.start = None
+        self.limit = None
 
     def get(self, *args, **kwargs):
         raise NotImplementedError
@@ -40,7 +41,7 @@ class apiBase:
                 if r.status_code == 429:
                     retry_after += int(r.headers['Retry-After'])
 
-                print(f'\nResponse: {r.status_code}, trying after {retry_after}secs')
+                print(f'\nResponse: {r.status_code} for {self.name}, trying after {retry_after}secs')
                 try:
                     print(r.json())
                 except:
@@ -66,7 +67,8 @@ class apiBase:
             df_update=None,
             ):      
 
-        # init        
+        # init
+        verbose_after = 10     
         name = f'{self.name}_{interval}'
         columns = columns or self.default_columns
         start = start or self.start
@@ -79,9 +81,9 @@ class apiBase:
 
         df = pd.DataFrame(columns=columns)
         df.index.name = 'timestamp'
-        # df = None
 
-        print(f'  Downloading {name}')
+        if steps > verbose_after:
+            print(f'  Downloading {name}')
         
         for i in range(steps):
             start_batch = start + (interval*i*self.per_step)
@@ -95,15 +97,11 @@ class apiBase:
                 print('error between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
-            # if df is None:
-            #     df = df_temp
-            # else:
-
             df_temp = pd.concat([df, df_temp])
             df = df_temp
 
-            print('\r' + f'  {i} of {steps}', end='')
-            # print(f'  {i} of {steps}')
+            if steps > verbose_after:
+                print('\r' + f'  {i} of {steps}', end='')
             time.sleep(self.sleep)
 
         if global_columns:
@@ -124,7 +122,8 @@ class apiBase:
             df.replace(0, np.nan, inplace=True)
             df.interpolate(inplace=True)
         
-        print(f'\nCompleted: {self.name}')
+        if steps > verbose_after:
+            print(f'\nCompleted: {self.name}')
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
         
         return df
@@ -149,6 +148,19 @@ class apiBase:
 
         return df_final
 
+    def calc_start(self, limit, start=None, end=None, interval=3600):
+        current_time = int(time.time())
+        if isinstance(interval, str):
+            interval = self.interval_check(interval)[0]
+
+        limit = self.limit if limit is None else limit
+        limit = int(limit / (interval / 3600))
+        end = current_time if end is None else end
+        if start is None:
+            start = end - (interval * (limit-1))  # limit -1 to be sure to get the latest hour
+        out_of_range = True if limit > self.limit else False
+        return start, end, out_of_range
+    
     def to_ts(self, df):   # Convert datetime to timestamp        
         return df.values.astype(np.int64) // 10 ** 9
 
