@@ -28,6 +28,7 @@ class bitmexBase(apiBase):
             start: int = None,
             end: int = None,
             interval: str = '1h',
+            columns: list = None,
             return_r: bool = False,
             ):
 
@@ -41,8 +42,6 @@ class bitmexBase(apiBase):
         
         if query is None:
             limit = self.limit if limit is None else limit
-            # start = self.start if start is None else start
-            # end = int(time.time()) if end is None else end
             start, end = self.to_date(start), self.to_date(end)
 
             query = {'symbol': symbol, 'binSize': interval, 'count': limit, 'startTime': start, 'endTime': end,
@@ -65,6 +64,8 @@ class bitmexBase(apiBase):
         # df = df.astype(float)
 
         df.index = df.index - 3600  # Compability with other apis, bitmex timestamp indexing is different
+        if columns is not None:
+            return df[columns]
         return df
 
     def get_hist(self, *args, **kwargs):

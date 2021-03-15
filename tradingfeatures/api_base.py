@@ -68,7 +68,7 @@ class apiBase:
             ):      
 
         # init
-        verbose_above = 10     
+        verbose_after = 10     
         name = f'{self.name}_{interval}'
         columns = columns or self.default_columns
         start = start or self.start
@@ -81,9 +81,8 @@ class apiBase:
 
         df = pd.DataFrame(columns=columns)
         df.index.name = 'timestamp'
-        # df = None
 
-        if steps > verbose_above:
+        if steps > verbose_after:
             print(f'  Downloading {name}')
         
         for i in range(steps):
@@ -91,21 +90,17 @@ class apiBase:
             end_batch = start_batch + (interval*self.per_step)
             if end_batch >= end:
                 end_batch = end
-            # try:
-            df_temp = self.get(start=str(start_batch), end=str(end_batch))
-            # except Exception as e:
-            #     print(e)
-            #     print('error between timestamps: ', start_batch, end_batch)
-            #     if steps <= 1: return None
-
-            # if df is None:
-            #     df = df_temp
-            # else:
+            try:
+                df_temp = self.get(start=str(start_batch), end=str(end_batch))
+            except Exception as e:
+                print(e)
+                print('error between timestamps: ', start_batch, end_batch)
+                if steps <= 1: return None
 
             df_temp = pd.concat([df, df_temp])
             df = df_temp
 
-            if steps > verbose_above:
+            if steps > verbose_after:
                 print('\r' + f'  {i} of {steps}', end='')
             time.sleep(self.sleep)
 
@@ -127,7 +122,7 @@ class apiBase:
             df.replace(0, np.nan, inplace=True)
             df.interpolate(inplace=True)
         
-        if steps > verbose_above:
+        if steps > verbose_after:
             print(f'\nCompleted: {self.name}')
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
         

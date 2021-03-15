@@ -29,6 +29,7 @@ class bitfinexBase(apiBase):
             start: int = None,
             end: int = None,
             interval: str = '1h',
+            columns: list = None,
             return_r: bool = False,
             sort = -1,
             ):      
@@ -57,6 +58,8 @@ class bitfinexBase(apiBase):
         df['timestamp'] = df['timestamp'].div(1000).astype(int)     # Fixing timestamp inside self.get
         df = df.set_index('timestamp')
         
+        if columns is not None:
+            return df[columns]
         return df
 
     def get_hist(self, *args, **kwargs):

@@ -14,7 +14,9 @@ from tradingfeatures import google_trends
 class Uber:
 
     def __init__(self,
-        api_to_use=['bitfinex', 'bitstamp']
+        api_to_use: list = ['bitfinex', 'bitstamp'],
+        columns: bool = None,
+        column_kwargs: dict = None,
         ):
 
         self.apis_dict = {
@@ -31,13 +33,15 @@ class Uber:
         self.bitmex = bitmex()
         self.google_trends = google_trends()
 
-        self.columns = ['open', 'low', 'high', 'close', 'volume']
+        self.columns = ['open', 'low', 'high', 'close', 'volume'] if columns is None else columns
+        self.column_kwargs = {} if column_kwargs is None else column_kwargs
 
     def eval_get(self, limit=1000, **kwargs):
         datasets = []
 
         for api in self.apis:
-            df = api.get(limit=limit)
+            api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
+            df = api.get(limit=limit, columns=api_columns)
             df = df[-limit:]
             datasets.append([api.name, df])
 

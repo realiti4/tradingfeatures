@@ -28,6 +28,7 @@ class bitstampBase(apiBase):
             start: int = None,
             end: int = None,
             interval: str = '1h',
+            columns: list = None,
             return_r: bool = False,
             ):
 
@@ -54,6 +55,8 @@ class bitstampBase(apiBase):
         df['timestamp'] = df['timestamp'].astype(int)
         df = df.set_index('timestamp')
 
+        if columns is not None:
+            return df[columns]
         return df
 
     def get_hist(self, *args, **kwargs):

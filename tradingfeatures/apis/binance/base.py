@@ -28,6 +28,7 @@ class binanceBase(apiBase):
             start: int = None,
             end: int = None,
             interval: str = '1h',
+            columns: list = None,
             return_r: bool = False,
             ):
 
@@ -49,8 +50,8 @@ class binanceBase(apiBase):
 
         result = r.json()
 
-        df = pd.DataFrame(result, columns=['open_time', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_volume',
-                                    'number_of_trades', 'taker_base_asset_volume', 'taker_quote_asset_volume', 'ignore'])
+        df = pd.DataFrame(result, columns=['open_time', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_vol',
+                                    'number_of_trades', 'taker_base_asset_vol', 'taker_quote_asset_vol', 'ignore'])
 
         df = df.astype(float)
         df['timestamp'] = df['open_time'].div(1000).astype(int)
@@ -60,7 +61,11 @@ class binanceBase(apiBase):
 
         df = df.set_index('timestamp')
         df.index = df.index.astype(int)
-        return df.astype(float)
+        df = df.astype(float)
+        
+        if columns is not None:
+            return df[columns]
+        return df
 
     def get_hist(self, *args, **kwargs):
         # start = 1500000000
