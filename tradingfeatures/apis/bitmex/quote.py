@@ -13,7 +13,8 @@ class bitmexQuote(bitmexBase):
         super(bitmexQuote, self).__init__()
         self.name = 'bitmex_quote'
         self.address = '/quote/bucketed'
-        self.start = 1423227200        
+        self.start = 1442227200
+        self.default_columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize']
 
     def get(self, symbol=None, query=None, start=None, end=None, *args, **kwargs):
 
@@ -24,12 +25,12 @@ class bitmexQuote(bitmexBase):
             *args, **kwargs
         )
 
-    def get_hist(self, columns=None, convert_funds=False, *args, **kwargs):
-        columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize'] if columns is None else columns
+    def get_hist(self, convert_funds=False, *args, **kwargs):
+        # columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize'] if columns is None else columns
 
         df = apiBase.get_hist(
             self,
-            columns=columns,
+            # columns=columns,
             # interval='8h',
             *args, **kwargs
         )

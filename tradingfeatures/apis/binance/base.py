@@ -19,6 +19,8 @@ class binanceBase(apiBase):
         self.address = '/api/v3/klines'
         self.start = 1364778000
         self.limit = 1000
+        self.default_columns = ['open', 'high', 'low', 'close', 'volume', 'quote_asset_vol',
+                            'number_of_trades', 'taker_base_asset_vol', 'taker_quote_asset_vol']
     
     def get(self,
             limit: int = None,

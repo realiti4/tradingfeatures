@@ -83,7 +83,7 @@ class apiBase:
         df.index.name = 'timestamp'
 
         if steps > verbose_after:
-            print(f'  Downloading {name}')
+            print(f'Downloading {name}')
         
         for i in range(steps):
             start_batch = start + (interval*i*self.per_step)
@@ -123,7 +123,7 @@ class apiBase:
             df.interpolate(inplace=True)
         
         if steps > verbose_after:
-            print(f'\nCompleted: {self.name}')
+            print(f'\n  Completed: {self.name}')
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
         
         return df

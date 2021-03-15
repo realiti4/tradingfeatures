@@ -12,12 +12,12 @@ class bitmexBase(apiBase):
         super(bitmexBase, self).__init__(
             name = 'bitmex',
             per_step = 500,
-            sleep = 0,
+            sleep = 0.2,
         )
 
         self.base_address = 'https://www.bitmex.com/api/v1'
         self.address = '/trade/bucketed'
-        self.start = 1423227200
+        self.start = 1442227200
         self.limit = 500
     
     def get(self,
@@ -51,7 +51,7 @@ class bitmexBase(apiBase):
         # Bitmex remaining limit
         if 'x-ratelimit-remaining' in r.headers:
             if int(r.headers['x-ratelimit-remaining']) <= 1:
-                print('\nreached the rate limit, bitmex api is sleeping...')
+                print('\nReached the rate limit, bitmex api is sleeping...')
                 time.sleep(61)
         if return_r:
             return r

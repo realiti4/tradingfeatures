@@ -61,6 +61,7 @@ class Uber:
             datasets = []
 
             for api in self.apis:
+                api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
                 df = api.get_hist(**kwargs)                
                 datasets.append([api.name, df])        
         
