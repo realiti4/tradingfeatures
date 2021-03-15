@@ -34,7 +34,7 @@ class bitmexBase(apiBase):
 
         start, end, out_of_range = self.calc_start(limit, start, end, interval)
         if out_of_range:
-            return self.get_hist(start=start, end=end)
+            return self.get_hist(start=start, end=end, columns=columns)
         
         address = address or self.address
         address = self.base_address + address

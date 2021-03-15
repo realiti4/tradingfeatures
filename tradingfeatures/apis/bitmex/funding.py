@@ -67,10 +67,11 @@ class bitmexFunding(bitmexBase):
         df_final = df_final[['fundingRate']]
         return df_final
 
-    def get_hist(self, convert_funds=False, *args, **kwargs):  
+    def get_hist(self, columns=None, convert_funds=False, *args, **kwargs):  
+        columns = ['fundingRate', 'fundingRateDaily'] if columns is None else columns
         return apiBase.get_hist(
             self,
-            columns=['fundingRate', 'fundingRateDaily'],
+            columns=columns,
             interval='8h',
             *args, **kwargs
         )

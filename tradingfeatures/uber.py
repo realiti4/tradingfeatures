@@ -49,7 +49,7 @@ class Uber:
 
         # Fix for 0 and nan - check here again later
         merged = merged.replace(0, np.nan)
-        if df.isnull().values.any():    # Check here later
+        if merged.isnull().values.any():    # Check here later
             merged = merged.interpolate()
 
         return merged
@@ -96,14 +96,7 @@ class Uber:
                 df_final[item] = df_main.loc[:, df_main.columns.str.contains(item)].mean(axis=1)
                 
         if date:
-            df_final['date'] = pd.to_datetime(df_final.index, unit='s', utc=True)
-            
-        # Extras
-        # if experiment_binance:
-        #     binance_api = self.apis_dict['binance']
-        #     columns = ['quote_asset_volume', 'number_of_trades', 'taker_base_asset_volume', 'taker_quote_asset_volume']
-        #     features = binance_api.get()[columns]
-        #     df_final = df_final.join(features)
+            df_final['date'] = pd.to_datetime(df_final.index, unit='s', utc=True)            
 
         if trends:
             df_trends = self.google_trends.update('uber_data')
