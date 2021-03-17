@@ -5,13 +5,15 @@ import pandas as pd
 
 from tradingfeatures import apiBase
 from tradingfeatures.apis.binance.base import binanceBase
-
+from tradingfeatures.apis.binance.funding import binanceFunding
 
 
 class binance(binanceBase):
 
     def __init__(self):
         super(binance, self).__init__()
+
+        self.funding = binanceFunding()
 
     def update(self, path, update_all=False, *args, **kwargs):        
         if update_all:
