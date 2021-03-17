@@ -61,7 +61,7 @@ class binanceFunding(binanceBase):
         df.pop('symbol')
         df = df.set_index('timestamp')
         df = df.astype(float)
-        df.rename(columns={'fundingRate': 'binanceFunding'}, inplace=True)   
+        df.rename(columns={'fundingRate': 'fundingRate_binance'}, inplace=True)   
         
         if get_latest:      # add this to binance as well
             df = self.get_recent(df)
@@ -76,7 +76,7 @@ class binanceFunding(binanceBase):
 
         r = requests.get(address, params={'symbol': 'BTCUSDT'})
         result = r.json()
-        df_temp = pd.DataFrame([[result['nextFundingTime'], result['lastFundingRate']]], columns=['timestamp', 'binanceFunding'])
+        df_temp = pd.DataFrame([[result['nextFundingTime'], result['lastFundingRate']]], columns=['timestamp', 'fundingRate_binance'])
         df_temp = df_temp.set_index(df_temp['timestamp'].div(1000).astype(int))
         df_temp.pop('timestamp')
         df = pd.concat([df, df_temp])
@@ -84,7 +84,7 @@ class binanceFunding(binanceBase):
         return df
 
     def get_hist(self, columns=None, *args, **kwargs):
-        columns = ['binanceFunding'] if columns is None else columns
+        columns = ['fundingRate_binance'] if columns is None else columns
         return apiBase.get_hist(
             self,
             columns=columns,

@@ -23,6 +23,7 @@ class Uber:
             'bitfinex': bitfinex(),
             'bitstamp': bitstamp(),            
             'binance': binance(),
+            'binance_funding': binance().funding,
             'bitmex': bitmex(),
             'bitmex_funding': bitmex().funding,
             'bitmex_quote': bitmex().quote,
