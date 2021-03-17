@@ -47,7 +47,7 @@ class bitmexFunding(bitmexBase):
 
         # check results for get_history with both, solving convert problem here
         # return df
-        return self.convert_funding(df)
+        return self.convert_funding(df, get_latest)
 
     def get_recent(self, df):   # Recent Funding
         address = '/instrument'
@@ -65,6 +65,7 @@ class bitmexFunding(bitmexBase):
 
         df_final = pd.concat([df, df_recent_funding])
         df_final = df_final[['fundingRate']]
+        
         return df_final
 
     def get_hist(self, columns=None, convert_funds=False, *args, **kwargs):  
@@ -76,8 +77,12 @@ class bitmexFunding(bitmexBase):
             *args, **kwargs
         )
 
-    def convert_funding(self, df):  # convert 8h to 1h and backfill
-        aranged_array = np.arange(df.index[0], df.index[-1] + 1, 3600)
+    def convert_funding(self, df, get_latest=False):  # convert 8h to 1h and backfill        
+        if not get_latest:
+            aranged_array = np.arange(df.index[0], (df.index[-1] + (8*3600)), 3600)
+        else:
+            aranged_array = np.arange(df.index[0], df.index[-1] + 1, 3600)
+
         df_empty = pd.DataFrame(index=aranged_array)
         df = df_empty.join(df)
         df = df_empty.join(df).fillna(method='bfill')
