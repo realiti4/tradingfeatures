@@ -11,7 +11,11 @@ or
     pip install git+https://github.com/realiti4/tradingfeatures.git@master --upgrade
 
 ## Example
-You can use `.get()`, `.get_history()` and `.update()` with all avaliable methods. Currently supported:
+- `.get()`: Returns most recent history amount you pass.
+- `.get_history()`: Downloads all avaliable history for that api.
+- `.update()`: Takes a csv file path and updates it.
+
+You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. Currently supported:
 
 * `bitfinex`
 * `bitstamp`
