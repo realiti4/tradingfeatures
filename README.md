@@ -18,6 +18,8 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
 * Binance
 * Bitmex
 
+Supported symbols: `btcusd`, `ethusd`, `ltcusd`
+
 ### Get history with .get()
 
     import pandas as pd
@@ -26,6 +28,8 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
     bitfinex = bitfinex()
 
     df = bitfinex.get(2000)
+    
+    df2 = bitfinex.get(2000, symbol='ethusd')   # Default is btcusd, you can pass others in symbol parameter
 
 Just pass how much data you want. It will return the amount in most recent 1h data. Currently only 1h data is supported. If history amount is above api limit, `.get()` will run `.get_history()` under the hood, so you don't need to worry about it. But if you want everything and don't want to guess how much data avaliable on each exchange, just run `.get_history()` and get everything.
 
