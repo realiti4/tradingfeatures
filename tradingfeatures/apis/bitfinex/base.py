@@ -20,6 +20,13 @@ class bitfinexBase(apiBase):
         self.start = 1364778000
         self.limit = 10000
         self.columns = ['timestamp', 'open', 'close', 'high', 'low', 'volume']
+
+        self.symbol_dict = {
+            'btcusd': 'tBTCUSD',
+            'ethusd': 'tETHUSD',
+            'ethbtc': 'tETHBTC',
+            'ltcusd': 'tLTCUSD',
+        }
     
     def get(self,
             limit: int = None,
@@ -40,7 +47,8 @@ class bitfinexBase(apiBase):
         
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'tBTCUSD'        
+        symbol = symbol or 'btcusd'
+        symbol = self.symbol_dict[symbol]
         
         if query is None:
             limit = self.limit if limit is None else limit
@@ -50,6 +58,8 @@ class bitfinexBase(apiBase):
             query = {'limit': limit, 'start': start, 'end': end, 'sort': sort}
 
         r = self.response_handler(address, params=query, timeout=60)
+        if return_r:
+            return r
         
         data = r.json()
         data.reverse()

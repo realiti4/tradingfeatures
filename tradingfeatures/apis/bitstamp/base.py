@@ -19,6 +19,13 @@ class bitstampBase(apiBase):
         self.address = '/ohlc'
         self.start = 1364778000
         self.limit = 1000
+
+        self.symbol_dict = {
+            'btcusd': 'btcusd',
+            'ethusd': 'ethusd',
+            'ethbtc': 'ethbtc',
+            'ltcusd': 'ltcusd',
+        }
     
     def get(self,
             limit: int = None,
@@ -38,7 +45,8 @@ class bitstampBase(apiBase):
         
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'btcusd'        
+        symbol = symbol or 'btcusd'
+        symbol = self.symbol_dict[symbol]    
         
         if query is None:
             limit = self.limit if limit is None else limit     

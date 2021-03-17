@@ -21,6 +21,13 @@ class binanceBase(apiBase):
         self.limit = 1000
         self.default_columns = ['open', 'high', 'low', 'close', 'volume', 'quote_asset_vol',
                             'number_of_trades', 'taker_base_asset_vol', 'taker_quote_asset_vol']
+
+        self.symbol_dict = {
+            'btcusd': 'BTCUSDT',
+            'ethusd': 'ETHUSDT',
+            'ethbtc': 'ETHBTC',
+            'ltcusd': 'LTCUSDT',
+        }
     
     def get(self,
             limit: int = None,
@@ -40,7 +47,8 @@ class binanceBase(apiBase):
         
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'BTCUSDT'        
+        symbol = symbol or 'btcusd'
+        symbol = self.symbol_dict[symbol]
         
         if query is None:
             limit = self.limit if limit is None else limit

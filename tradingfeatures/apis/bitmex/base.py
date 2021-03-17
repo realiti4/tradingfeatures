@@ -19,6 +19,13 @@ class bitmexBase(apiBase):
         self.address = '/trade/bucketed'
         self.start = 1442227200
         self.limit = 500
+
+        self.symbol_dict = {
+            'btcusd': 'XBT',
+            'ethusd': 'ETH',
+            # 'ethbtc': 'ETHBTC',
+            'ltcusd': 'LTC',
+        }
     
     def get(self,
             limit: int = None,
@@ -38,7 +45,8 @@ class bitmexBase(apiBase):
         
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'XBT'
+        symbol = symbol or 'btcusd'
+        symbol = self.symbol_dict[symbol]
         
         if query is None:
             limit = self.limit if limit is None else limit
