@@ -11,12 +11,15 @@ or
     pip install git+https://github.com/realiti4/tradingfeatures.git@master --upgrade
 
 ## Example
-You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. Currently supported:
+You can use `.get()`, `.get_history()` and `.update()` with all avaliable methods. Currently supported:
 
-* Bitfinex
-* Bitstamp
-* Binance
-* Bitmex
+* `bitfinex`
+* `bitstamp`
+* `binance`
+  * `binance.funding`
+* `bitmex`
+  * `bitmex.funding`
+  * `bitmex.quote`
 
 Supported symbols: `btcusd`, `ethusd`, `ltcusd`
 
