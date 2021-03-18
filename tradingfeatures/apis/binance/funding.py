@@ -51,7 +51,7 @@ class binanceFunding(binanceBase):
 
             query = {'symbol': symbol, 'startTime': start, 'endTime': end, 'limit': limit}
 
-        r = requests.get(address, params=query)
+        r = self.response_handler(address, query)
 
         result = r.json()
 
@@ -74,7 +74,7 @@ class binanceFunding(binanceBase):
         address = '/fapi/v1/premiumIndex'
         address = self.base_address + address
 
-        r = requests.get(address, params={'symbol': 'BTCUSDT'})
+        r = self.response_handler(address, params={'symbol': 'BTCUSDT'})
         result = r.json()
         df_temp = pd.DataFrame([[result['nextFundingTime'], result['lastFundingRate']]], columns=['timestamp', 'fundingRate_binance'])
         df_temp = df_temp.set_index(df_temp['timestamp'].div(1000).astype(int))

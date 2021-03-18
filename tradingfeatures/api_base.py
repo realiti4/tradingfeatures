@@ -95,10 +95,10 @@ class apiBase:
                 df_temp = self.get(symbol=symbol, start=str(start_batch), end=str(end_batch))
                 if df_temp is None:     # Try this fix for other apis
                     print('    Debug: df_temp is empty')
+                    assert len(df) == 0, 'Debug: df is not empty, it will try to concat with itself'
                     df_temp = df
             except Exception as e:
-                print(e)
-                print('error between timestamps: ', start_batch, end_batch)
+                print(e, '\nError between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
             df_temp = pd.concat([df, df_temp])
@@ -111,10 +111,7 @@ class apiBase:
         if global_columns:
             df = df[columns]
         # df = df.drop_duplicates(subset='timestamp')
-        df = df[~df.index.duplicated(keep='first')]
-        
-        # df = df.set_index('timestamp')
-        # df.index = df.index.astype(int)
+        df = df[~df.index.duplicated(keep='first')]        
         df = df.astype(float)       # check this one
 
         if df_update:   # check this later
@@ -126,8 +123,9 @@ class apiBase:
             df.replace(0, np.nan, inplace=True)
             df.interpolate(inplace=True)
         
-        if steps > verbose_after:
-            print(f'\n  Completed: {self.name}')
+        # if steps > verbose_after:
+        print(f'\n  Completed: {self.name}')
+
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
         
         return df
