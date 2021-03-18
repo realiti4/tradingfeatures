@@ -95,7 +95,7 @@ class apiBase:
                 df_temp = self.get(symbol=symbol, start=str(start_batch), end=str(end_batch))
                 if df_temp is None:     # Try this fix for other apis
                     print('    Debug: df_temp is empty')
-                    assert len(df) == 0, 'Debug: df is not empty, it will try to concat with itself'
+                    assert len(df) == 0, 'Debug: empty df_temp in middle of download'
                     df_temp = df
             except Exception as e:
                 print(e, '\nError between timestamps: ', start_batch, end_batch)

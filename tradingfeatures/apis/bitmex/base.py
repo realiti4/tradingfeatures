@@ -19,6 +19,8 @@ class bitmexBase(apiBase):
         self.address = '/trade/bucketed'
         self.start = 1442227200
         self.limit = 500
+        self.default_columns = ['open', 'high', 'low', 'close', 'trades', 'volume', 'vwap', 'lastSize', 'turnover',
+                    'homeNotional', 'foreignNotional']
 
         self.symbol_dict = {
             'btcusd': 'XBT',

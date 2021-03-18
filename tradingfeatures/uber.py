@@ -68,9 +68,14 @@ class Uber:
         
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
         
-        # Remove active hour
-        for i in range(len(datasets)):           
-            datasets[i][1] = datasets[i][1].loc[:self.current_time()-1]
+        # Remove active hour and fix columns
+        for i in range(len(datasets)):
+            api_name = datasets[i][0]
+            api_columns = self.column_kwargs[api_name] if api_name in self.column_kwargs else None
+            if api_columns is None:
+                datasets[i][1] = datasets[i][1].loc[:self.current_time()-1]
+            else:
+                datasets[i][1] = datasets[i][1][api_columns].loc[:self.current_time()-1]
 
         if save:    # Maybe save above after just getting history
             for df in datasets:
@@ -118,16 +123,20 @@ class Uber:
 
         for api in self.apis:
             path_df = path + f'/{api.name}.csv'
-            if os.path.exists(path_df):
-                df = api.update(path_df)
-            else:
-                print(f"Couldn't find {api.name} data, downloading from strach..")
-                df = api.get_hist()
-                df.to_csv(path_df)
-
+            df = pd.read_csv(path_df, index_col=0)
             datasets.append([api.name, df])
+            # break
 
-        updated = self.get(path, datasets=datasets, fundings=fundings, **kwargs)
+            # if os.path.exists(path_df):
+            #     df = api.update(path_df)
+            # else:
+            #     print(f"Couldn't find {api.name} data, downloading from strach..")
+            #     df = api.get_hist()
+            #     df.to_csv(path_df)
+
+            # datasets.append([api.name, df])
+
+        updated = self.get(path, datasets=datasets, fundings=fundings, save=False, **kwargs)
         updated.to_csv(path + '/merged_final.csv')
         return
 
