@@ -58,6 +58,7 @@ class apiBase:
         r.raise_for_status()
 
     def get_hist(self,
+            symbol = None,
             start = None, 
             end = None,
             columns = None,
@@ -91,7 +92,10 @@ class apiBase:
             if end_batch >= end:
                 end_batch = end
             try:
-                df_temp = self.get(start=str(start_batch), end=str(end_batch))
+                df_temp = self.get(symbol=symbol, start=str(start_batch), end=str(end_batch))
+                if df_temp is None:     # Try this fix for other apis
+                    print('    Debug: df_temp is empty')
+                    df_temp = df
             except Exception as e:
                 print(e)
                 print('error between timestamps: ', start_batch, end_batch)

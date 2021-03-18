@@ -65,11 +65,13 @@ class bitmexBase(apiBase):
             return r
 
         df = pd.read_json(r.content)
+        if len(df) == 0:
+            return None
         df['timestamp'] = self.to_ts(df['timestamp'])
         df.pop('symbol')
         df = df.set_index('timestamp')
         df.index = df.index.astype(int)
-        # df = df.astype(float)
+        # df = df.astype(np.float32)
 
         df.index = df.index - 3600  # Compability with other apis, bitmex timestamp indexing is different
         if columns is not None:

@@ -62,6 +62,8 @@ class bitfinexBase(apiBase):
             return r
         
         data = r.json()
+        if len(data) == 0:
+            return None
         data.reverse()
 
         df = pd.DataFrame(data, columns=self.columns)

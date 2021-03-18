@@ -59,6 +59,8 @@ class binanceBase(apiBase):
         r = requests.get(address, params=query)
 
         result = r.json()
+        if len(result) == 0:
+            return None
 
         df = pd.DataFrame(result, columns=['open_time', 'open', 'high', 'low', 'close', 'volume', 'close_time', 'quote_asset_vol',
                                     'number_of_trades', 'taker_base_asset_vol', 'taker_quote_asset_vol', 'ignore'])

@@ -41,7 +41,7 @@ class bitstampBase(apiBase):
 
         start, end, out_of_range = self.calc_start(limit, start, end)
         if out_of_range:
-            return self.get_hist(start=start, end=end) 
+            return self.get_hist(symbol=symbol, start=start, end=end) 
         
         address = address or self.address
         address = self.base_address + address
@@ -57,6 +57,8 @@ class bitstampBase(apiBase):
         r = self.response_handler(address, params=query, timeout=60)
         
         result = r.json()['data']['ohlc']
+        if len(result) == 0:
+            return None
 
         df = pd.DataFrame(result)   # fix index
         df = df.astype(float)
