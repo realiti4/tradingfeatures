@@ -43,7 +43,8 @@ class binanceFunding(binanceBase):
         
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'BTCUSDT'        
+        symbol = symbol or 'btcusd'
+        symbol = self.symbol_dict[symbol]    
         
         if query is None:
             limit = self.limit if limit is None else limit

@@ -11,7 +11,7 @@ class binanceOrderBook(binanceBase):
 
     def __init__(self):
         super(binanceOrderBook, self).__init__()
-        self.name = 'binance_fundings'
+        self.name = 'binance_orderbook'
         self.base_address = 'https://api.binance.com'
         self.address = '/api/v3/depth'
         self.start = 1568002400

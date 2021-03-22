@@ -31,9 +31,9 @@ class bitfinexShortLong(bitfinexBase):
     #         sort = -1,
     #         ):      
         
-        address = f'{self.address}/pos.size:1m:tBTCUSD:long/hist'
+        address = f'{self.address}/pos.size:1h:tBTCUSD:long/hist'
         
-        query = {'limit': limit, 'start': 1464778000, 'sort': 1}
+        query = {'limit': 10000, 'sort': -1}
         
         r = super(bitfinexShortLong, self).get(
             address=address,
