@@ -25,7 +25,7 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
   * `bitmex.funding`
   * `bitmex.quote`
 
-Supported symbols: `btcusd`, `ethusd`, `ltcusd`
+Supported symbols: `btcusd`, `ethusd`, `ltcusd`. These are guaranteed to work with every module. You can stil use any symbol that an exchange supports. But same pair is different for each exchange of course. Using an unsupported symbold will give you a warning, but it should work just fine as long as you are using a correct symbol for that api.
 
 
 ### Get history with .get()

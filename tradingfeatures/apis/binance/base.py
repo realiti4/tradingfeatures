@@ -51,7 +51,7 @@ class binanceBase(apiBase):
         address = address or self.address
         address = self.base_address + address
         symbol = symbol or 'btcusd'
-        symbol = self.symbol_dict[symbol]
+        symbol = self.symbol_check(symbol)
         
         if query is None:
             limit = self.limit if limit is None else limit
@@ -87,4 +87,7 @@ class binanceBase(apiBase):
         return super(binanceBase, self).get_hist(
             *args, **kwargs
         )
+
+    def _start_check(self, address, symbol):
+        raise Exception('Cant sort oldest item')
     

@@ -49,11 +49,11 @@ class bitstampBase(apiBase):
         address = address or self.address
         address = self.base_address + address
         symbol = symbol or 'btcusd'
-        symbol = self.symbol_dict[symbol]    
+        symbol = self.symbol_check(symbol)
         
         if query is None:
             limit = self.limit if limit is None else limit     
-            address = address + f'/{symbol}/'   
+            address = address + f'/{symbol}/'
 
             query = {'start': start,'end': end, 'step': 3600, 'limit': limit}
 
@@ -76,4 +76,7 @@ class bitstampBase(apiBase):
         return super(bitstampBase, self).get_hist(
             *args, **kwargs
         )
+
+    def _start_check(self, address, symbol):
+        raise Exception('Cant sort oldest item')
     

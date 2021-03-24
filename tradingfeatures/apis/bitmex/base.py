@@ -51,7 +51,7 @@ class bitmexBase(apiBase):
         address = address or self.address
         address = self.base_address + address
         symbol = symbol or 'btcusd'
-        symbol = self.symbol_dict[symbol]
+        symbol = self.symbol_check(symbol)
         
         if query is None:
             limit = self.limit if limit is None else limit
@@ -91,7 +91,7 @@ class bitmexBase(apiBase):
 
     def _start_check(self, address, symbol):
         address = self.base_address + address
-        querry = {'symbol': self.symbol_dict[symbol], 'binSize': '1h', 'reverse': 'false'}
+        querry = {'symbol': self.symbol_check(symbol), 'binSize': '1h', 'reverse': 'false'}
         r = self.response_handler(address, params=querry)
         df = pd.read_json(r.content)
         df['timestamp'] = self.to_ts(df['timestamp'])

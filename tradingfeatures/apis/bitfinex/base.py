@@ -51,7 +51,7 @@ class bitfinexBase(apiBase):
         address = address or self.address
         address = self.base_address + address
         symbol = symbol or 'btcusd'
-        symbol = self.symbol_dict[symbol]
+        symbol = self.symbol_check(symbol)
         
         if query is None:
             limit = self.limit if limit is None else limit
@@ -85,7 +85,7 @@ class bitfinexBase(apiBase):
 
     def _start_check(self, address, symbol):
         address = self.base_address + address
-        address = address + f'/trade:1h:{self.symbol_dict[symbol]}/hist'
+        address = address + f'/trade:1h:{self.symbol_check(symbol)}/hist'
         querry = {'limit': self.per_step, 'sort': 1}
         r = self.response_handler(address, params=querry)        
         self.start = int(r.json()[0][0]/1000)

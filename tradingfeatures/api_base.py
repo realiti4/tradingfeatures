@@ -14,6 +14,7 @@ class apiBase:
         self.sleep = sleep
 
         self.default_columns = ['high', 'volume', 'low', 'close', 'open']
+        self.symbol_dict = None
         self.start = None
         self.limit = None
 
@@ -27,6 +28,13 @@ class apiBase:
             return interval, minutes
         else:
             raise Exception('Only hours supportted right now')
+
+    def symbol_check(self, symbol):
+        if symbol in self.symbol_dict:
+            symbol = self.symbol_dict[symbol]
+        else:
+            print('Warning: Not using a supported symbol, not every module might work.')
+        return symbol
 
     def response_handler(self, address, params, timeout=60):
         r = requests.get(address, params=params, timeout=timeout)
