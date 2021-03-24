@@ -16,7 +16,7 @@ class bitmexQuote(bitmexBase):
         self.start = 1442227200
         self.default_columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize']
 
-    def get(self, symbol=None, query=None, start=None, end=None, *args, **kwargs):
+    def get(self, query=None, start=None, end=None, *args, **kwargs):
 
         return super(bitmexQuote, self).get(
             query=query,
@@ -26,6 +26,7 @@ class bitmexQuote(bitmexBase):
         )
 
     def get_hist(self, convert_funds=False, *args, **kwargs):
+        self._start_check(self.address, **kwargs)
         # columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize'] if columns is None else columns
 
         df = apiBase.get_hist(

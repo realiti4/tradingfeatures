@@ -27,6 +27,7 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
 
 Supported symbols: `btcusd`, `ethusd`, `ltcusd`
 
+
 ### Get history with .get()
 
     import pandas as pd

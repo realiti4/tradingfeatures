@@ -12,7 +12,7 @@ class bitmexBase(apiBase):
         super(bitmexBase, self).__init__(
             name = 'bitmex',
             per_step = 500,
-            sleep = 0.2,
+            sleep = 1.01,
         )
 
         self.base_address = 'https://www.bitmex.com/api/v1'
@@ -27,6 +27,9 @@ class bitmexBase(apiBase):
             'ethusd': 'ETH',
             # 'ethbtc': 'ETHBTC',
             'ltcusd': 'LTC',
+            'bchusd': 'BCH',
+            'eosusd': 'EOS',
+            'xrpusd': 'XRP',
         }
     
     def get(self,
@@ -60,7 +63,7 @@ class bitmexBase(apiBase):
         r = self.response_handler(address, query)
         # Bitmex remaining limit
         if 'x-ratelimit-remaining' in r.headers:
-            if int(r.headers['x-ratelimit-remaining']) <= 1:
+            if int(r.headers['x-ratelimit-remaining']) <= 2:
                 print('\nReached the rate limit, bitmex api is sleeping...')
                 time.sleep(61)
         if return_r:
@@ -81,6 +84,15 @@ class bitmexBase(apiBase):
         return df
 
     def get_hist(self, *args, **kwargs):
+        self._start_check(address=self.address, **kwargs)
         return super(bitmexBase, self).get_hist(
             *args, **kwargs
         )
+
+    def _start_check(self, address, symbol):
+        address = self.base_address + address
+        querry = {'symbol': self.symbol_dict[symbol], 'binSize': '1h', 'reverse': 'false'}
+        r = self.response_handler(address, params=querry)
+        df = pd.read_json(r.content)
+        df['timestamp'] = self.to_ts(df['timestamp'])
+        self.start =df['timestamp'][0]

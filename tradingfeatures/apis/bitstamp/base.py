@@ -25,6 +25,9 @@ class bitstampBase(apiBase):
             'ethusd': 'ethusd',
             'ethbtc': 'ethbtc',
             'ltcusd': 'ltcusd',
+            'bchusd': 'bthusd',
+            'eosusd': 'eosusd',
+            'xrpusd': 'xrpusd',
         }
     
     def get(self,

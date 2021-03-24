@@ -27,6 +27,9 @@ class binanceBase(apiBase):
             'ethusd': 'ETHUSDT',
             'ethbtc': 'ETHBTC',
             'ltcusd': 'LTCUSDT',
+            'bchusd': 'BCHUSDT',
+            'eosusd': 'EOSUSDT',
+            'xrpusd': 'XRPUSDT',
         }
     
     def get(self,
