@@ -44,14 +44,15 @@ class bitmexBase(apiBase):
             return_r: bool = False,
             ):
 
-        start, end, out_of_range = self.calc_start(limit, start, end, interval)
-        if out_of_range:
-            return self.get_hist(start=start, end=end, columns=columns)
-        
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'btcusd'
-        symbol = self.symbol_check(symbol)
+        symbol = symbol or 'btcusd'        
+        
+        start, end, out_of_range = self.calc_start(limit, start, end, interval)
+        if out_of_range:
+            return self.get_hist(symbol=symbol, start=start, end=end, columns=columns)
+
+        symbol = self.symbol_check(symbol)  # had to give raw symbol above, this has to be after
         
         if query is None:
             limit = self.limit if limit is None else limit
@@ -84,7 +85,7 @@ class bitmexBase(apiBase):
         return df
 
     def get_hist(self, *args, **kwargs):
-        self._start_check(address=self.address, **kwargs)
+        self._start_check(address=self.address, symbol=kwargs['symbol'])
         return super(bitmexBase, self).get_hist(
             *args, **kwargs
         )

@@ -42,14 +42,15 @@ class bitstampBase(apiBase):
             return_r: bool = False,
             ):
 
-        start, end, out_of_range = self.calc_start(limit, start, end)
-        if out_of_range:
-            return self.get_hist(symbol=symbol, start=start, end=end) 
-        
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'btcusd'
-        symbol = self.symbol_check(symbol)
+        symbol = symbol or 'btcusd'        
+
+        start, end, out_of_range = self.calc_start(limit, start, end)
+        if out_of_range:
+            return self.get_hist(symbol=symbol, start=start, end=end)
+
+        symbol = self.symbol_check(symbol)  # had to give raw symbol above, this has to be after
         
         if query is None:
             limit = self.limit if limit is None else limit     

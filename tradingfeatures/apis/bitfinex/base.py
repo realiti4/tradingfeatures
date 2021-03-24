@@ -44,14 +44,15 @@ class bitfinexBase(apiBase):
             sort = -1,
             ):      
         
-        start, end, out_of_range = self.calc_start(limit, start, end)
-        if out_of_range:
-            return self.get_hist(start=start, end=end)
-        
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'btcusd'
-        symbol = self.symbol_check(symbol)
+        symbol = symbol or 'btcusd'        
+        
+        start, end, out_of_range = self.calc_start(limit, start, end)
+        if out_of_range:
+            return self.get_hist(symbol=symbol, start=start, end=end)
+
+        symbol = self.symbol_check(symbol)  # had to give raw symbol above, this has to be after
         
         if query is None:
             limit = self.limit if limit is None else limit
@@ -78,7 +79,7 @@ class bitfinexBase(apiBase):
         return df
 
     def get_hist(self, *args, **kwargs):
-        self._start_check(self.address, **kwargs)
+        self._start_check(self.address, kwargs['symbol'])
         return super(bitfinexBase, self).get_hist(
             *args, **kwargs
         )
