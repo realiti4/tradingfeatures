@@ -18,6 +18,8 @@ class apiBase:
         self.start = None
         self.limit = None
 
+        self.suppress_warning = False
+
     def get(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -33,7 +35,9 @@ class apiBase:
         if symbol in self.symbol_dict:
             symbol = self.symbol_dict[symbol]
         else:
-            print('Warning: Not using a supported symbol, not every module might work.')
+            if not self.suppress_warning:
+                print('Warning: Not using a supported symbol, not every module might work.')
+                self.suppress_warning = True
         return symbol
 
     def response_handler(self, address, params, timeout=60):
