@@ -25,12 +25,14 @@ class bitmexQuote(bitmexBase):
             *args, **kwargs
         )
 
-    def get_hist(self, convert_funds=False, *args, **kwargs):
-        self._start_check(self.address, kwargs['symbol'])
+    def get_hist(self, symbol=None, convert_funds=False, *args, **kwargs):
+        symbol = symbol or 'btcusd'
+        self._start_check(self.address, symbol=symbol)
         # columns = ['bidSize', 'bidPrice', 'askPrice', 'askSize'] if columns is None else columns
 
         df = apiBase.get_hist(
             self,
+            symbol=symbol,
             # columns=columns,
             # interval='8h',
             *args, **kwargs
