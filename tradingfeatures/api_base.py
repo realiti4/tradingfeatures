@@ -32,6 +32,7 @@ class apiBase:
             raise Exception('Only hours supportted right now')
 
     def symbol_check(self, symbol):
+        # symbol = 'btcusd' if symbol is None else symbol
         if symbol in self.symbol_dict:
             symbol = self.symbol_dict[symbol]
         else:

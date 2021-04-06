@@ -70,6 +70,7 @@ class binanceBase(apiBase):
                                     'number_of_trades', 'taker_base_asset_vol', 'taker_quote_asset_vol', 'ignore'])
 
         df = df.astype(float)
+        df['taker_sell_base_asset_vol'] = df['volume'] - df['taker_base_asset_vol']
         df['timestamp'] = df['open_time'].div(1000).astype(int)
         df.pop('open_time')
         df.pop('close_time')

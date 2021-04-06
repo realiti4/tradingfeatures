@@ -46,7 +46,7 @@ class bitmexBase(apiBase):
 
         address = address or self.address
         address = self.base_address + address
-        symbol = symbol or 'btcusd'        
+        symbol = symbol or 'btcusd'
         
         start, end, out_of_range = self.calc_start(limit, start, end, interval)
         if out_of_range:
@@ -84,9 +84,11 @@ class bitmexBase(apiBase):
             return df[columns]
         return df
 
-    def get_hist(self, *args, **kwargs):
-        self._start_check(address=self.address, symbol=kwargs['symbol'])
+    def get_hist(self, symbol=None, *args, **kwargs):
+        symbol = symbol or 'btcusd'
+        self._start_check(address=self.address, symbol=symbol)
         return super(bitmexBase, self).get_hist(
+            symbol=symbol,
             *args, **kwargs
         )
 

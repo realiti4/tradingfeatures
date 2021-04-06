@@ -78,9 +78,11 @@ class bitfinexBase(apiBase):
             return df[columns]
         return df
 
-    def get_hist(self, *args, **kwargs):
-        self._start_check(self.address, kwargs['symbol'])
+    def get_hist(self, symbol=None, *args, **kwargs):
+        symbol = symbol or 'btcusd'
+        self._start_check(self.address, symbol=symbol)
         return super(bitfinexBase, self).get_hist(
+            symbol=symbol,
             *args, **kwargs
         )
 
