@@ -17,10 +17,11 @@ class binanceBase(apiBase):
 
         self.base_address = 'https://api.binance.com'
         self.address = '/api/v3/klines'
-        self.start = 1364778000
+        self.start = 1484778000     # 1364778000
         self.limit = 1000
         self.default_columns = ['open', 'high', 'low', 'close', 'volume', 'quote_asset_vol',
-                            'number_of_trades', 'taker_base_asset_vol', 'taker_quote_asset_vol']
+                            'number_of_trades', 'taker_base_asset_vol', 'taker_sell_base_asset_vol',
+                            'taker_quote_asset_vol']
 
         self.symbol_dict = {
             'btcusd': 'BTCUSDT',
