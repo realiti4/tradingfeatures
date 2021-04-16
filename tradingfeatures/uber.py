@@ -4,11 +4,9 @@ import requests
 import numpy as np
 import pandas as pd
 
-from tradingfeatures import bitfinex
-from tradingfeatures import bitstamp
-from tradingfeatures import bitmex
-from tradingfeatures import binance
-from tradingfeatures import google_trends
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tradingfeatures import bitfinex, bitstamp, bitmex, binance, google_trends
+from tqdm.contrib.concurrent import thread_map
 
 
 class Uber:
@@ -38,13 +36,15 @@ class Uber:
         self.column_kwargs = {} if column_kwargs is None else column_kwargs
 
     def eval_get(self, limit=1000, **kwargs):
-        datasets = []
+        futures = []
 
-        for api in self.apis:
-            api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
-            df = api.get(limit=limit, columns=api_columns)
-            df = df[-limit:]
-            datasets.append([api.name, df])
+        with ThreadPoolExecutor(8) as executor:
+            for api in self.apis:
+                api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
+                future = executor.submit(api.get, limit=limit, columns=api_columns)
+                futures.append([api.name, future])
+
+        datasets = [[item[0], item[1].result()[-limit:]] for item in futures]
 
         merged = self.get(datasets=datasets, save=False, trends=False, date=False, **kwargs)
 
@@ -59,12 +59,14 @@ class Uber:
             save=True, **kwargs):
         
         if datasets is None:    # if dataset update, else download everything
-            datasets = []
+            futures = []
+            with ThreadPoolExecutor(4) as executor:
+                for api in self.apis:
+                    api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
+                    future = executor.submit(api.get_hist, **kwargs)
+                    futures.append([api.name, future])
 
-            for api in self.apis:
-                api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
-                df = api.get_hist(**kwargs)                
-                datasets.append([api.name, df])        
+            datasets = [[item[0], item[1].result()] for item in futures]
         
         assert isinstance(datasets[0], list) and len(datasets[0]) == 2, "Use a list of list like [[api_name, api_df], ..]"
         

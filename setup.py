@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="tradingfeatures",
-    version="0.6.0",
+    version="0.6.1",
     author="Onur Cetinkol",
     author_email="realiti44@gmail.com",
     description="A useful tool to download market history from popular exchanges.",
