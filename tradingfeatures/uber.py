@@ -119,26 +119,27 @@ class Uber:
         
         return df_final
         
-    def update(self, path='uber_data', fundings=True, **kwargs):  # Fix path
+    def update(self, path='uber_data', **kwargs):  # Fix path
         working_directory = os.getcwd()
         datasets = []
 
         for api in self.apis:
             path_df = path + f'/{api.name}.csv'
-            df = pd.read_csv(path_df, index_col=0)
-            datasets.append([api.name, df])
-            # break
-
-            # if os.path.exists(path_df):
-            #     df = api.update(path_df)
-            # else:
-            #     print(f"Couldn't find {api.name} data, downloading from strach..")
-            #     df = api.get_hist()
-            #     df.to_csv(path_df)
-
+            # df = pd.read_csv(path_df, index_col=0)
             # datasets.append([api.name, df])
+            # # break
 
-        updated = self.get(path, datasets=datasets, fundings=fundings, save=False, **kwargs)
+            if os.path.exists(path_df):
+                df = api.update(path_df)
+            else:
+                print(f"Couldn't find {api.name} data, downloading from strach..")
+                raise Exception
+                # df = api.get_hist()
+                # df.to_csv(path_df)
+
+            datasets.append([api.name, df])
+
+        updated = self.get(path, datasets=datasets, save=False, **kwargs)
         updated.to_csv(path + '/merged_final.csv')
         return
 

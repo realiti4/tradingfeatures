@@ -153,7 +153,7 @@ class apiBase:
             df.to_csv(path)
             return
         
-        df = pd.read_csv(path, index_col='timestamp')
+        df = pd.read_csv(path, index_col=0)
 
         last_timestamp = df.index[-1]
         updates = self.get_hist(start=last_timestamp)
