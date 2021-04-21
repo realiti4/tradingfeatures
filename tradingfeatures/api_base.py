@@ -27,10 +27,13 @@ class apiBase:
     def interval_check(self, interval):
         if 'h' in interval:            
             interval = int(interval.split('h')[0]) * 3600
-            minutes = int(interval / 60)
-            return interval, minutes
+            minutes = int(interval / 60)            
+        elif 'm' in interval:
+            interval = int(interval.split('m')[0]) * 60
+            minutes = int(interval / 60)            
         else:
             raise Exception('Only hours supportted right now')
+        return interval, minutes
 
     def symbol_check(self, symbol):
         # symbol = 'btcusd' if symbol is None else symbol
@@ -89,6 +92,7 @@ class apiBase:
         start = start or self.start
         end = end or int(time.time())
 
+        interval_str = interval     # to give it to .get() func
         interval, minutes = self.interval_check(interval)
 
         total_entries = (end - start) // interval
@@ -106,7 +110,7 @@ class apiBase:
             if end_batch >= end:
                 end_batch = end
             try:
-                df_temp = self.get(symbol=symbol, start=str(start_batch), end=str(end_batch))
+                df_temp = self.get(symbol=symbol, interval=interval_str, start=str(start_batch), end=str(end_batch))
                 if df_temp is None:     # Try this fix for other apis
                     print('    Debug: df_temp is empty')
                     assert len(df) == 0, 'Debug: empty df_temp in middle of download'
