@@ -19,5 +19,5 @@ setup(
     ],
     python_requires='>=3.6',
     packages=find_packages(),
-    install_requires=["numpy", "pandas", "requests", "pytrends"],
+    install_requires=["numpy", "pandas", "requests", "tqdm"],
 )
