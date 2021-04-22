@@ -117,7 +117,7 @@ class apiBase:
                     df_temp = df
             except Exception as e:
                 # raise e
-                print(e, '\nError between timestamps: ', start_batch, end_batch)
+                print(e, '\nDebug: error between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
             df_temp = pd.concat([df, df_temp])

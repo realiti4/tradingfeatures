@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from tradingfeatures import bitfinex, bitstamp, bitmex, binance, google_trends
+from tradingfeatures import bitfinex, bitstamp, bitmex, binance
 from tqdm.contrib.concurrent import thread_map
 
 
@@ -30,7 +30,7 @@ class Uber:
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
 
         self.bitmex = bitmex()
-        self.google_trends = google_trends()
+        # self.google_trends = google_trends()
 
         self.columns = ['open', 'low', 'high', 'close', 'volume'] if columns is None else columns
         self.column_kwargs = {} if column_kwargs is None else column_kwargs
