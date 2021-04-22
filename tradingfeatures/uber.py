@@ -41,7 +41,7 @@ class Uber:
         with ThreadPoolExecutor(8) as executor:
             for api in self.apis:
                 api_columns = self.column_kwargs[api.name] if api.name in self.column_kwargs else None
-                future = executor.submit(api.get, limit=limit, columns=api_columns)
+                future = executor.submit(api.get, limit=limit, columns=api_columns, **kwargs)
                 futures.append([api.name, future])
 
         datasets = [[item[0], item[1].result()[-limit:]] for item in futures]

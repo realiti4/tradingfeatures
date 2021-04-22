@@ -175,7 +175,7 @@ class apiBase:
             interval = self.interval_check(interval)[0]
 
         limit = self.limit if limit is None else limit
-        limit = int(limit / scale)      # for 8h funding, bad solution
+        limit = int(limit / scale)      # for 8h funding scaling
         end = current_time if end is None else end
         if start is None:
             start = end - (interval * (limit-1))  # limit -1 to be sure to get the latest hour

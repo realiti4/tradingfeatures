@@ -25,7 +25,7 @@ You can use `.get()`, `.get_history()` and `.update()` with all avaliable apis. 
   * `bitmex.funding`
   * `bitmex.quote`
 
-Supported symbols: `btcusd`, `ethusd`, `ltcusd`. These are guaranteed to work with every module. You can stil use any symbol that an exchange supports. But same pair is different for each exchange of course. Using an unsupported symbold will give you a warning, but it should work just fine as long as you are using a correct symbol for that api.
+Supported symbols: `btcusd`, `ethusd`, `ltcusd`. These are guaranteed to work with every module. You can stil use any symbol that an exchange supports. But same pair is different for each exchange of course. Using an unsupported symbol will give you a warning, but it should work just fine as long as you are using a correct symbol for that api.
 
 
 ### Get history with .get()
@@ -39,7 +39,9 @@ Supported symbols: `btcusd`, `ethusd`, `ltcusd`. These are guaranteed to work wi
     
     df2 = bitfinex.get(2000, symbol='ethusd')   # Default is btcusd, you can pass others in symbol parameter
 
-Just pass how much data you want. It will return the amount in most recent 1h data. Currently only 1h data is supported. If history amount is above api limit, `.get()` will run `.get_history()` under the hood, so you don't need to worry about it. But if you want everything and don't want to guess how much data avaliable on each exchange, just run `.get_history()` and get everything.
+    df3 = bitfinex.get(20000, interval='1m')    # You can pass any interval that exchange api supports
+
+Just pass how much data you want. It will return the amount in most recent 1h data. If history amount is above api limit, `.get()` will run `.get_history()` under the hood, so you don't need to worry about it. But if you want everything avaliable on an exchange, just run `.get_history()`.
 
 ### Download all available history with .get_history()
 The tool will download all avaliable history while respecting request per minute limits. Using it easy, and it takes couple of minutes for 1h data.
@@ -59,6 +61,6 @@ The tool will download all avaliable history while respecting request per minute
 
     bitstamp = bitstamp()
     
-    bitstamp.update_csv('bitstamp.csv')    
+    bitstamp.update('bitstamp.csv')    
 
 Update takes a path variable to csv file and updates it.
