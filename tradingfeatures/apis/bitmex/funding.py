@@ -15,10 +15,19 @@ class bitmexFunding(bitmexBase):
         self.address = '/funding'
         self.start = 1463227200
         self.limit = 500
+        self.default_columns = ['fundingRate']
 
-    def get(self, limit=None, symbol=None, query=None, start=None, end=None, *args, **kwargs):
-        interval = '8h'
-        start, end, out_of_range = self.calc_start(limit, start, end, interval)
+    def get(self, 
+            limit=None, 
+            symbol=None, 
+            query=None, 
+            start=None, 
+            end=None, 
+            interval: str = '8h',
+            *args, **kwargs
+            ):
+        assert interval == '8h'        
+        start, end, out_of_range = self.calc_start(limit, start, end, interval, scale=8)
         if out_of_range:
             return self.get_hist(start=start, end=end)
 
@@ -69,10 +78,10 @@ class bitmexFunding(bitmexBase):
         return df_final
 
     def get_hist(self, columns=None, convert_funds=False, *args, **kwargs):  
-        columns = ['fundingRate', 'fundingRateDaily'] if columns is None else columns
+        # columns = ['fundingRate', 'fundingRateDaily'] if columns is None else columns
         return apiBase.get_hist(
             self,
-            columns=columns,
+            # columns=columns,
             interval='8h',
             *args, **kwargs
         )

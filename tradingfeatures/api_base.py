@@ -27,7 +27,7 @@ class apiBase:
     def interval_check(self, interval):
         if 'h' in interval:            
             interval = int(interval.split('h')[0]) * 3600
-            minutes = int(interval / 60)            
+            minutes = int(interval / 60)    
         elif 'm' in interval:
             interval = int(interval.split('m')[0]) * 60
             minutes = int(interval / 60)            
@@ -116,6 +116,7 @@ class apiBase:
                     assert len(df) == 0, 'Debug: empty df_temp in middle of download'
                     df_temp = df
             except Exception as e:
+                # raise e
                 print(e, '\nError between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
@@ -168,13 +169,13 @@ class apiBase:
 
         return df_final
 
-    def calc_start(self, limit, start=None, end=None, interval=3600):
+    def calc_start(self, limit, start=None, end=None, interval=3600, scale=1):
         current_time = int(time.time())
         if isinstance(interval, str):
             interval = self.interval_check(interval)[0]
 
         limit = self.limit if limit is None else limit
-        limit = int(limit / (interval / 3600))
+        limit = int(limit / scale)      # for 8h funding, bad solution
         end = current_time if end is None else end
         if start is None:
             start = end - (interval * (limit-1))  # limit -1 to be sure to get the latest hour

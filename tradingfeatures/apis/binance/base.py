@@ -49,9 +49,9 @@ class binanceBase(apiBase):
         address = self.base_address + address
         symbol = symbol or 'btcusd'        
         
-        start, end, out_of_range = self.calc_start(limit, start, end)
+        start, end, out_of_range = self.calc_start(limit, start, end, interval)
         if out_of_range:
-            return self.get_hist(symbol=symbol, start=start, end=end)
+            return self.get_hist(symbol=symbol, start=start, end=end, interval=interval)
 
         symbol = self.symbol_check(symbol)  # had to give raw symbol above, this has to be after     
         

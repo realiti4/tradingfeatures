@@ -25,13 +25,13 @@ class binanceFunding(binanceBase):
             query: dict = None,
             start: int = None,
             end: int = None,
-            interval: str = '1h',
+            interval: str = '8h',
             columns: list = None,
             return_r: bool = False,
             ):
 
-        interval = '8h'
-        start, end, out_of_range = self.calc_start(limit, start, end, interval)
+        assert interval == '8h'
+        start, end, out_of_range = self.calc_start(limit, start, end, interval, scale=8)
         if out_of_range:
             return self.get_hist(start=start, end=end)
 
@@ -50,7 +50,7 @@ class binanceFunding(binanceBase):
             limit = self.limit if limit is None else limit
             start, end = self.ts_to_mts(start), self.ts_to_mts(end)
 
-            query = {'symbol': symbol, 'startTime': start, 'endTime': end, 'limit': limit}
+            query = {'symbol': symbol, 'startTime': start, 'endTime': end, 'limit': self.limit}
 
         r = self.response_handler(address, query)
 
