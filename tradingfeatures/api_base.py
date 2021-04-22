@@ -149,7 +149,7 @@ class apiBase:
         
         return df
 
-    def update(self, path):
+    def update(self, path, **kwargs):
         # assert os.path.exists(path), "path doesn't exists!"
         if not os.path.exists(path):    # Disabled
             assert '.csv' in path, "Not a valid .csv location!"
@@ -161,7 +161,7 @@ class apiBase:
         df = pd.read_csv(path, index_col=0)
 
         last_timestamp = df.index[-1]
-        updates = self.get_hist(start=last_timestamp)
+        updates = self.get_hist(start=last_timestamp, **kwargs)
 
         df_final = pd.concat([df, updates])
         df_final = df_final[~df_final.index.duplicated(keep='first')]
