@@ -34,5 +34,16 @@ def test_interval_get():
     df_bitfinex = bitfinex.get(interval='1m')
     df_bitstamp = bitstamp.get(interval='1m')
 
+def test_funding():
+    # Bitmex
+    bitmex.funding.get()
+    bitmex.funding.get(5000)
+    bitmex.funding.get_hist()
+
+    # Binance
+    binance.funding.get()
+    binance.funding.get(5000)
+    binance.funding.get_hist()
+
 def test_uber():
     df_eval = uber.eval_get(2000)
