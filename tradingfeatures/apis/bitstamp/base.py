@@ -55,8 +55,9 @@ class bitstampBase(apiBase):
         if query is None:
             limit = self.limit if limit is None else limit     
             address = address + f'/{symbol}/'
+            interval_int, minutes = self.interval_check(interval)
 
-            query = {'start': start,'end': end, 'step': 3600, 'limit': limit}
+            query = {'start': start,'end': end, 'step': interval_int, 'limit': limit}
 
         r = self.response_handler(address, params=query, timeout=60)
         

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="tradingfeatures",
-    version="0.6.2",
+    version="0.6.3",
     author="Onur Cetinkol",
     author_email="realiti44@gmail.com",
     description="A useful tool to download market history from popular exchanges.",
@@ -18,6 +18,9 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',
-    packages=find_packages(),
+    keywords="download market history binance bitfinex bitmex bitstamp",
+    packages=find_packages(
+        exclude=["test", "test.*", "examples", "examples.*", "docs", "docs.*"]
+    ),
     install_requires=["numpy", "pandas", "requests", "tqdm"],
 )
