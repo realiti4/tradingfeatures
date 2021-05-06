@@ -25,17 +25,17 @@ class apiBase:
         raise NotImplementedError
 
     def interval_check(self, interval):
-        if 'h' in interval:            
-            interval = int(interval.split('h')[0]) * 3600
+        if 'h' in interval.lower():            
+            interval = int(interval.lower().split('h')[0]) * 3600
             minutes = int(interval / 60)    
-        elif 'm' in interval:
-            interval = int(interval.split('m')[0]) * 60
+        elif 'm' in interval.lower():
+            interval = int(interval.lower().split('m')[0]) * 60
             minutes = int(interval / 60)
-        elif 'd' in interval:
-            interval = int(interval.split('d')[0]) * 3600 * 24
+        elif 'd' in interval.lower():
+            interval = int(interval.lower().split('d')[0]) * 3600 * 24
             minutes = int(interval / 60)
         else:
-            raise Exception('Only days, hours and minutes supportted right now')
+            raise Exception('Only days, hours and minutes are supportted at the moment')
         return interval, minutes
 
     def symbol_check(self, symbol):
