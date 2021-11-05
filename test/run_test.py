@@ -47,3 +47,7 @@ def test_funding():
 
 def test_uber():
     df_eval = uber.eval_get(2000)
+
+def test_order_book():
+    bids, asks = binance.orderbook.get(limit=5000)
+    bids, asks = binance.orderbook.get(limit=5000, group_by=100)
