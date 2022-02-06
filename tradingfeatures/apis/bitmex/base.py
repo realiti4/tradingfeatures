@@ -70,10 +70,10 @@ class bitmexBase(apiBase):
         if return_r:
             return r
 
-        df = pd.read_json(r.content)
+        df = pd.DataFrame.from_dict(r.json())
         if len(df) == 0:
             return None
-        df['timestamp'] = self.to_ts(df['timestamp'])
+        df['timestamp'] = self.to_ts(pd.to_datetime(df['timestamp']))
         df.pop('symbol')
         df = df.set_index('timestamp')
         df.index = df.index.astype(int)
@@ -96,6 +96,6 @@ class bitmexBase(apiBase):
         address = self.base_address + address
         querry = {'symbol': self.symbol_check(symbol), 'binSize': '1h', 'reverse': 'false'}
         r = self.response_handler(address, params=querry)
-        df = pd.read_json(r.content)
-        df['timestamp'] = self.to_ts(df['timestamp'])
-        self.start =df['timestamp'][0]
+        df = pd.DataFrame.from_dict(r.json())
+        df['timestamp'] = self.to_ts(pd.to_datetime(df['timestamp']))
+        self.start = df['timestamp'][0]
