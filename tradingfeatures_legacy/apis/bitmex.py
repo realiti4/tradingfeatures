@@ -46,8 +46,8 @@ class bitmexLegacy(apiBase):
         if return_r:
             return r
 
-        df = pd.read_json(r.content)
-        df['timestamp'] = self.to_ts(df['timestamp'])
+        df = pd.DataFrame.from_dict(r.json())
+        df['timestamp'] = self.to_ts(pd.to_datetime(df['timestamp']))
         df.pop('symbol')
         # df = df.astype(float)
 
