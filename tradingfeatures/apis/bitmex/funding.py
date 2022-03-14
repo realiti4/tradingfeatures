@@ -32,13 +32,14 @@ class bitmexFunding(bitmexBase):
             return self.get_hist(start=start, end=end)
 
         # Get recent funding if getting latest data
-        if (int(end) // 3600) *3600 == (time.time() // 3600) *3600:
+        if (int(end) // 3600) * 3600 == (time.time() // 3600) * 3600:
             get_latest = True
         else:
             get_latest = False
 
         start, end = self.to_date(start), self.to_date(end)
-        symbol = symbol or 'XBT'
+        symbol = symbol or 'btcusd'
+        symbol = self.symbol_check(symbol)
         
         if query is None:
             query = {'symbol': symbol, 'count': self.limit, 'reverse': 'false', 'startTime': start}
