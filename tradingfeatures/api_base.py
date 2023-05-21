@@ -189,7 +189,7 @@ class apiBase:
         return df.values.astype(np.int64) // 10 ** 9
 
     def to_date(self, x):       # Convert timestamp to datetime
-        return pd.to_datetime(x, unit='s', utc=True)
+        return pd.to_datetime(int(x), unit='s', utc=True)
 
     def ts_to_mts(self, time):
         # second timestamp to millisecond timestamp
