@@ -7,14 +7,14 @@ import pandas as pd
 
 from datetime import datetime
 
-class apiBase:
 
+class apiBase:
     def __init__(self, name, per_step, sleep):
         self.name = name
         self.per_step = per_step
         self.sleep = sleep
 
-        self.default_columns = ['high', 'volume', 'low', 'close', 'open']
+        self.default_columns = ["high", "volume", "low", "close", "open"]
         self.symbol_dict = None
         self.start = None
         self.limit = None
@@ -25,17 +25,17 @@ class apiBase:
         raise NotImplementedError
 
     def interval_check(self, interval):
-        if 'h' in interval.lower():            
-            interval = int(interval.lower().split('h')[0]) * 3600
-            minutes = int(interval / 60)    
-        elif 'm' in interval.lower():
-            interval = int(interval.lower().split('m')[0]) * 60
+        if "h" in interval.lower():
+            interval = int(interval.lower().split("h")[0]) * 3600
             minutes = int(interval / 60)
-        elif 'd' in interval.lower():
-            interval = int(interval.lower().split('d')[0]) * 3600 * 24
+        elif "m" in interval.lower():
+            interval = int(interval.lower().split("m")[0]) * 60
+            minutes = int(interval / 60)
+        elif "d" in interval.lower():
+            interval = int(interval.lower().split("d")[0]) * 3600 * 24
             minutes = int(interval / 60)
         else:
-            raise Exception('Only days, hours and minutes are supportted at the moment')
+            raise Exception("Only days, hours and minutes are supportted at the moment")
         return interval, minutes
 
     def symbol_check(self, symbol):
@@ -44,7 +44,9 @@ class apiBase:
             symbol = self.symbol_dict[symbol]
         else:
             if not self.suppress_warning:
-                print('Warning: Not using a supported symbol, not every module might work.')
+                print(
+                    "Warning: Not using a supported symbol, not every module might work."
+                )
                 self.suppress_warning = True
         return symbol
 
@@ -57,11 +59,13 @@ class apiBase:
 
             tries = 4
             retry_after = 10
-            for i in range(tries):            
+            for i in range(tries):
                 if r.status_code == 429:
-                    retry_after += int(r.headers['Retry-After'])
+                    retry_after += int(r.headers["Retry-After"])
 
-                print(f'\nResponse: {r.status_code} for {self.name}, trying after {retry_after}secs')
+                print(
+                    f"\nResponse: {r.status_code} for {self.name}, trying after {retry_after}secs"
+                )
                 try:
                     print(r.json())
                 except:
@@ -77,51 +81,59 @@ class apiBase:
 
         r.raise_for_status()
 
-    def get_hist(self,
-            symbol = None,
-            start = None, 
-            end = None,
-            columns = None,
-            interval = '1h',    # Don't use this for now, only 1h is supported
-            global_columns=True,
-            interpolate=True,   # Should be ok to enable I guess, check later
-            df_update=None,
-            ):      
-
+    def get_hist(
+        self,
+        symbol=None,
+        start=None,
+        end=None,
+        columns=None,
+        interval="1h",  # Don't use this for now, only 1h is supported
+        global_columns=True,
+        interpolate=True,  # Should be ok to enable I guess, check later
+        df_update=None,
+    ):
         # init
-        verbose_after = 10     
-        name = f'{self.name}_{interval}'
+        verbose_after = 10
+        name = f"{self.name}_{interval}"
         columns = columns or self.default_columns
         start = start or self.start
         end = end or int(time.time())
 
-        interval_str = interval     # to give it to .get() func
+        interval_str = interval  # to give it to .get() func
         interval, minutes = self.interval_check(interval)
 
         total_entries = (end - start) // interval
         steps = (total_entries // self.per_step) + 1
 
         df = pd.DataFrame(columns=columns)
-        df.index.name = 'timestamp'
+        df.index.name = "timestamp"
 
         if steps > verbose_after:
-            print(f'Downloading {name}')
-        
+            print(f"Downloading {name}")
+
         for i in range(steps):
-            start_batch = start + (interval*i*self.per_step)
-            end_batch = start_batch + (interval*self.per_step)
+            start_batch = start + (interval * i * self.per_step)
+            end_batch = start_batch + (interval * self.per_step)
             if end_batch >= end:
                 end_batch = end
             try:
-                df_temp = self.get(symbol=symbol, interval=interval_str, start=str(start_batch), end=str(end_batch))
-                if df_temp is None:     # Try this fix for other apis
-                    print('    Warning: Got empty window from exchange at start')
-                    assert len(df) == 0, 'Warning: Got empty window from exchange in middle of download'
+                df_temp = self.get(
+                    symbol=symbol,
+                    interval=interval_str,
+                    start=str(start_batch),
+                    end=str(end_batch),
+                )
+                if df_temp is None:  # Try this fix for other apis
+                    print("    Warning: Got empty window from exchange at start")
+                    assert (
+                        len(df) == 0
+                    ), "Warning: Got empty window from exchange in middle of download"
                     df_temp = pd.DataFrame()
             except Exception as e:
                 # raise e
-                print(e, '\nDebug: error between timestamps: ', start_batch, end_batch)
-                if steps <= 1: return None
+                print(e, "\nDebug: error between timestamps: ", start_batch, end_batch)
+                if steps <= 1:
+                    return None
 
             if not (df.empty or df_temp.empty):
                 df = pd.concat([df, df_temp])
@@ -129,47 +141,47 @@ class apiBase:
                 df = df_temp.copy()
 
             if steps > verbose_after:
-                print('\r' + f'  {i} of {steps}', end='')
+                print("\r" + f"  {i} of {steps}", end="")
             time.sleep(self.sleep)
 
         if global_columns:
             df = df[columns]
         # df = df.drop_duplicates(subset='timestamp')
-        df = df[~df.index.duplicated(keep='first')]        
-        df = df.astype(float)       # check this one
+        df = df[~df.index.duplicated(keep="first")]
+        df = df.astype(float)  # check this one
 
-        if df_update:   # check this later
+        if df_update:  # check this later
             df = pd.concat([df_update, df])
-            df = df[~df.index.duplicated(keep='first')]
+            df = df[~df.index.duplicated(keep="first")]
 
         if interpolate:
             # interpolate nan data
             df.replace(0, np.nan, inplace=True)
             df.interpolate(inplace=True)
-        
+
         # if steps > verbose_after:
-        print(f'\n  Completed: {self.name}')
+        print(f"\n  Completed: {self.name}")
 
         # df['date'] = pd.to_datetime(df.index, unit='s', utc=True)
-        
+
         return df
 
     def update(self, path, **kwargs):
         # assert os.path.exists(path), "path doesn't exists!"
-        if not os.path.exists(path):    # Disabled
-            assert '.csv' in path, "Not a valid .csv location!"
+        if not os.path.exists(path):  # Disabled
+            assert ".csv" in path, "Not a valid .csv location!"
             print("Couldn't find a file to update, downloading all history now..")
             df = self.get_hist()
             df.to_csv(path)
             return
-        
+
         df = pd.read_csv(path, index_col=0)
 
         last_timestamp = df.index[-1]
         updates = self.get_hist(start=last_timestamp, **kwargs)
 
         df_final = pd.concat([df, updates])
-        df_final = df_final[~df_final.index.duplicated(keep='first')]
+        df_final = df_final[~df_final.index.duplicated(keep="first")]
         df_final.to_csv(path)
 
         return df_final
@@ -180,24 +192,28 @@ class apiBase:
             interval = self.interval_check(interval)[0]
 
         limit = self.limit if limit is None else limit
-        limit = int(limit / scale)      # for 8h funding scaling
+        limit = int(limit / scale)  # for 8h funding scaling
         end = current_time if end is None else end
         if start is None:
-            start = end - (interval * (limit-1))  # limit -1 to be sure to get the latest hour
+            start = end - (
+                interval * (limit - 1)
+            )  # limit -1 to be sure to get the latest hour
         out_of_range = True if limit > self.limit else False
         return start, end, out_of_range
-    
-    def to_ts(self, df):   # Convert datetime to timestamp        
-        return df.values.astype(np.int64) // 10 ** 9
 
-    def to_date(self, x):       # Convert timestamp to datetime
-        return pd.to_datetime(int(x), unit='s', utc=True)
+    def to_ts(self, df):  # Convert datetime to timestamp
+        return df.values.astype(np.int64) // 10**9
+
+    def to_date(self, x):  # Convert timestamp to datetime
+        return pd.to_datetime(int(x), unit="s", utc=True)
 
     def ts_to_mts(self, time):
         # second timestamp to millisecond timestamp
         if time:
             if len(str(time)) == 10:
-                return int(time)*1000
+                return int(time) * 1000
             else:
-                assert len(str(time)) == 13, 'Please use a timestamp value with lenght 10!'
+                assert (
+                    len(str(time)) == 13
+                ), "Please use a timestamp value with lenght 10!"
                 return int(time)
