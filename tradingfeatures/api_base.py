@@ -115,16 +115,18 @@ class apiBase:
             try:
                 df_temp = self.get(symbol=symbol, interval=interval_str, start=str(start_batch), end=str(end_batch))
                 if df_temp is None:     # Try this fix for other apis
-                    print('    Debug: df_temp is empty')
-                    assert len(df) == 0, 'Debug: empty df_temp in middle of download'
-                    df_temp = df
+                    print('    Warning: Got empty window from exchange at start')
+                    assert len(df) == 0, 'Warning: Got empty window from exchange in middle of download'
+                    df_temp = pd.DataFrame()
             except Exception as e:
                 # raise e
                 print(e, '\nDebug: error between timestamps: ', start_batch, end_batch)
                 if steps <= 1: return None
 
-            df_temp = pd.concat([df, df_temp])
-            df = df_temp
+            if not (df.empty or df_temp.empty):
+                df = pd.concat([df, df_temp])
+            elif not df_temp.empty:
+                df = df_temp.copy()
 
             if steps > verbose_after:
                 print('\r' + f'  {i} of {steps}', end='')
