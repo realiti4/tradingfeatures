@@ -103,5 +103,5 @@ class binanceFunding(binanceBase):
 
         df_empty = pd.DataFrame(index=aranged_array)
         df = df_empty.join(df)
-        df = df_empty.join(df).fillna(method="bfill")
+        df = df_empty.join(df).bfill()
         return df
