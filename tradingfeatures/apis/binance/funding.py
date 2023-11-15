@@ -62,14 +62,14 @@ class binanceFunding(binanceBase):
 
         df = pd.DataFrame(result)
         df["timestamp"] = df["fundingTime"].div(1000).astype(int)
-        df.pop("fundingTime")
-        df.pop("symbol")
+        df = df[['fundingRate', 'timestamp']]
         df = df.set_index("timestamp")
-        df = df.astype(float)
         df.rename(columns={"fundingRate": "fundingRate_binance"}, inplace=True)
 
         if get_latest:  # add this to binance as well
             df = self.get_recent(df)
+
+        df = df.astype(float)
 
         # if columns is not None:
         #     return df[columns]

@@ -124,11 +124,11 @@ class apiBase:
                     end=str(end_batch),
                 )
                 if df_temp is None:  # Try this fix for other apis
-                    print("    Warning: Got empty window from exchange at start")
+                    df_temp = pd.DataFrame()
                     assert (
                         len(df) == 0
                     ), "Warning: Got empty window from exchange in middle of download"
-                    df_temp = pd.DataFrame()
+                    print("    Warning: Got empty window from exchange at start")
             except Exception as e:
                 # raise e
                 print(e, "\nDebug: error between timestamps: ", start_batch, end_batch)
@@ -196,7 +196,7 @@ class apiBase:
         end = current_time if end is None else end
         if start is None:
             start = end - (
-                interval * (limit - 1)
+                (interval * limit) - 3600
             )  # limit -1 to be sure to get the latest hour
         out_of_range = True if limit > self.limit else False
         return start, end, out_of_range
