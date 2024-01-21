@@ -33,7 +33,7 @@ class bitmexBase(apiBase):
         ]
 
         self.symbol_dict = {
-            "btcusd": "XBT",
+            "btcusd": "XBTUSD",
             "ethusd": "ETH",
             # 'ethbtc': 'ETHBTC',
             "ltcusd": "LTC",

@@ -127,8 +127,8 @@ class apiBase:
                     df_temp = pd.DataFrame()
                     assert (
                         len(df) == 0
-                    ), "Warning: Got empty window from exchange in middle of download"
-                    print("    Warning: Got empty window from exchange at start")
+                    ), f"Warning: Got empty window from exchange in middle of download for {self.name}"
+                    print(f"    Warning: Got empty window from exchange at start for {self.name}")
             except Exception as e:
                 # raise e
                 print(e, "\nDebug: error between timestamps: ", start_batch, end_batch)
