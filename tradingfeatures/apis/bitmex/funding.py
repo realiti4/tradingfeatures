@@ -64,7 +64,7 @@ class bitmexFunding(bitmexBase):
     def get_recent(self, df):  # Recent Funding
         address = "/instrument"
         r_current = super(bitmexFunding, self).get(
-            address=address, query={"symbol": "XBT"}, return_r=True
+            address=address, query={"symbol": "XBTUSD"}, return_r=True
         )
         current_data = r_current.json()[0]
 
