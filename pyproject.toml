@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tradingfeatures"
+version = "0.8.0"
+description = "A useful tool to download market history from popular exchanges."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.11"
+keywords = ["download", "market", "history", "binance", "bitfinex", "bitmex", "bitstamp"]
+license = { text = "MIT License" }
+authors = [
+    { name = "Onur Cetinkol", email = "realiti44@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "requests",
+    "tqdm"
+]
+
+[tool.setuptools.packages.find]
+exclude = ["test", "test.*", "examples", "examples.*", "docs", "docs.*"]

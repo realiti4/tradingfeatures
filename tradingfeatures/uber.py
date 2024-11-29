@@ -28,9 +28,6 @@ class Uber:
 
         self.apis = [self.apis_dict.get(key) for key in api_to_use]
 
-        self.bitmex = bitmex()
-        # self.google_trends = google_trends()
-
         self.columns = (
             ["open", "low", "high", "close", "volume"] if columns is None else columns
         )
@@ -53,14 +50,15 @@ class Uber:
 
         datasets = [[item[0], item[1].result()[-limit:]] for item in futures]
 
-        merged = self.get(
-            datasets=datasets, save=False, trends=False, date=False, **kwargs
-        )
+        merged = self.get(datasets=datasets, save=False, date=False, **kwargs)
 
         # Fix for 0 and nan - check here again later
         merged = merged.replace(0, np.nan)
         if merged.isnull().values.any():  # Check here later
             merged = merged.interpolate()
+
+        # Remove preceding nan data
+        merged = merged.loc[merged.first_valid_index():]
 
         return merged
 
@@ -69,7 +67,6 @@ class Uber:
         path="",
         datasets=None,
         merge=True,
-        trends=False,
         date=True,
         save=True,
         **kwargs,
@@ -139,37 +136,22 @@ class Uber:
         if date:
             df_final["date"] = pd.to_datetime(df_final.index, unit="s", utc=True)
 
-        if trends:
-            df_trends = self.google_trends.update("uber_data")
-            df_final = df_final.join(df_trends)
-
-            df_final["google_trends"].replace(0, np.nan, inplace=True)
-            df_final["google_trends"] = (
-                df_final["google_trends"].astype(float).interpolate()
-            )
-
         if save:
             df_final.to_csv(path + "/merged_final.csv")
 
         return df_final
 
     def update(self, path="uber_data", **kwargs):  # Fix path
-        working_directory = os.getcwd()
         datasets = []
 
         for api in self.apis:
             path_df = path + f"/{api.name}.csv"
-            # df = pd.read_csv(path_df, index_col=0)
-            # datasets.append([api.name, df])
-            # # break
 
             if os.path.exists(path_df):
                 df = api.update(path_df)
             else:
                 print(f"Couldn't find {api.name} data, downloading from strach..")
                 raise Exception
-                # df = api.get_hist()
-                # df.to_csv(path_df)
 
             datasets.append([api.name, df])
 
